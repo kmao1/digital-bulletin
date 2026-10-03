@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap');
+    :root{--bg:#040208;--accent:#a855f7;--glow:rgba(168,85,247,.3);--text:#f3e8ff;--muted:#a885c7;--border:rgba(168,85,247,.3)}
+    *{box-sizing:border-box;margin:0;padding:0;font-family:'Rajdhani',sans-serif}body{background:var(--bg);color:var(--text);min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px}
+    .frame{width:100%;max-width:450px;background:radial-gradient(circle at 10% 20%,rgba(161,0,255,.15),rgba(8,7,11,.95) 70%);border:1px solid var(--border);border-radius:16px;position:relative;padding:40px;box-shadow:0 0 40px var(--glow),inset 0 0 15px rgba(161,0,255,.2);backdrop-filter:blur(10px);opacity:0;transform:translateY(24px) scale(.9);animation:loginFramePop .75s cubic-bezier(.17,.67,.32,1.25) forwards}.frame:before,.frame:after{content:'';position:absolute;height:2px;background:var(--accent);box-shadow:0 0 8px var(--accent)}.frame:before{top:20px;left:20px;width:60px}.frame:after{bottom:20px;right:20px;width:80px}
+    @keyframes loginFramePop{0%{opacity:0;transform:translateY(24px) scale(.9)}70%{opacity:1;transform:translateY(-3px) scale(1.02)}100%{opacity:1;transform:translateY(0) scale(1)}}.frame>*{opacity:0;transform:translateY(12px);animation:loginContentPop .5s ease forwards}.frame>.nav-header{animation-delay:.35s}.frame>.hero{animation-delay:.48s}.frame>section{animation-delay:.62s}@keyframes loginContentPop{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-delay:0ms!important;transition-duration:.01ms!important}}
+    .frame{background:radial-gradient(circle at 10% 20%,rgba(255,48,48,.15),rgba(11,7,7,.95) 70%)}.input:focus{box-shadow:0 0 12px rgba(255,48,48,.3)}
+    .nav-header{margin-bottom:30px}.nav-back{display:inline-flex;align-items:center;gap:8px;background:transparent;border:1px solid var(--accent);color:var(--text);padding:8px 16px;border-radius:4px;font:700 .75rem 'Orbitron';letter-spacing:2px;text-decoration:none;clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);transition:all .3s}.nav-back:hover{background:var(--accent);box-shadow:0 0 15px var(--accent)}
+    .hero{text-align:center;margin-bottom:30px}.hero h1{font:900 1.8rem/1 'Orbitron';letter-spacing:3px;text-transform:uppercase;background:linear-gradient(180deg,#fff,#b5b5b5);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:10px}.hero p{color:var(--accent);font-size:.85rem;letter-spacing:2px;font-weight:700;text-transform:uppercase;text-shadow:0 0 8px var(--glow)}.heading{font:700 1.2rem 'Orbitron';letter-spacing:2px;margin-bottom:12px}.subheading{color:var(--muted);font-size:.85rem;line-height:1.4;margin-bottom:20px}.group{margin-bottom:16px}.label{display:block;color:var(--muted);font-size:.7rem;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;font-weight:600}.input-wrap{position:relative;display:flex;align-items:center}.icon{position:absolute;left:15px;color:var(--accent);width:20px;text-align:center}.input{width:100%;padding:12px 15px 12px 45px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:.85rem}.input:focus{outline:none;border-color:var(--accent);background:rgba(255,255,255,.08);box-shadow:0 0 12px rgba(161,0,255,.3)}.input[readonly]{cursor:not-allowed}.message{font-size:.8rem;color:#fda4af;margin-bottom:12px}.submit{width:100%;padding:12px;background:#fff;color:#000;border:0;border-radius:6px;font:700 .85rem 'Orbitron';letter-spacing:2px;text-transform:uppercase;cursor:pointer;margin-top:8px;transition:all .3s}.submit:hover{transform:translateY(-2px);box-shadow:0 8px 20px var(--glow)}
+    @media(max-width:520px){body{padding:12px}.frame{padding:30px 22px}.hero h1{font-size:1.45rem}}
+    @media (max-width: 600px) { body { align-items:flex-start; padding:12px; } .frame { max-width:none; min-height:calc(100vh - 24px); padding:30px 20px 24px; } .hero { margin-bottom:24px; } .hero h1 { font-size:clamp(1.45rem,8vw,1.8rem); letter-spacing:2px; } .heading { font-size:1rem; } .input { font-size:.9rem; } }
+    .frame { background: radial-gradient(circle at 50% 20%, rgba(168, 85, 247, .15), rgba(4, 2, 8, .95) 70%); box-shadow: 0 0 40px var(--glow), inset 0 0 15px rgba(168, 85, 247, .12); }
+    .frame .input:focus { box-shadow: 0 0 12px rgba(168, 85, 247, .3); }
+    .message { color: #d5adff; }
+  </style>
+</head>
+<body>
+  <main class="frame">
+    <div class="nav-header"><a href="index.html" class="nav-back"><i class="fa-solid fa-arrow-left"></i> BACK</a></div>
+    <div class="hero"><h1>Admin Access</h1><p>System Administration Portal</p></div>
+    <section>
+      <h2 class="heading">Administrator Login</h2>
+      <p class="subheading">Sign in with your administrator account to access the system dashboard.</p>
+      <form action="conn.php" method="post">
+        <input type="hidden" name="action" value="admin_login">
+        <div class="group"><label class="label" for="admin-email">Email Address</label><div class="input-wrap"><i class="fa-solid fa-envelope icon"></i><input class="input" id="admin-email" name="email" type="email" placeholder="Admin Email" required></div></div>
+        <div class="group"><label class="label" for="admin-password">Password</label><div class="input-wrap"><i class="fa-solid fa-lock icon"></i><input class="input" id="admin-password" name="password" type="password" placeholder="Password" required></div></div>
+        <div class="message" id="login-message" role="alert"></div>
+        <button class="submit" type="submit"><i class="fa-solid fa-shield-halved"></i> Sign In</button>
+      </form>
+    </section>
+  </main>
+  <script>
+    const message = new URLSearchParams(window.location.search).get('message');
+    if (message) document.getElementById('login-message').textContent = message;
+  </script>
+</body>
+</html>

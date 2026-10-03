@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Connect - Digital Bulletin Board</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=Rajdhani:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+   
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cyber: {
+                            bg: '#05020a',
+                            card: 'rgba(12, 7, 20, 0.90)',
+                            border: '#2a0c3d',
+                            red: '#a855f7',
+                            redglow: '#c084fc',
+                            dim: '#581c87',
+                            text: '#f3e8ff',
+                            muted: '#a885c7'
+                        }
+                    },
+                    fontFamily: {
+                        orbitron: ['Orbitron', 'sans-serif'],
+                        rajdhani: ['Rajdhani', 'sans-serif'],
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #040208;
+            color: #f3e8ff;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            user-select: none;
+        }
+
+        .ambient-glow-bg {
+            background: radial-gradient(circle at 50% 20%, rgba(168, 85, 247, 0.15) 0%, rgba(4, 2, 8, 0.95) 70%);
+        }
+
+        .cyber-card {
+            background: rgba(12, 6, 20, 0.88);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            position: relative;
+            box-shadow: 0 0 25px rgba(168, 85, 247, 0.12);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .cyber-card:hover {
+            border-color: rgba(168, 85, 247, 0.7);
+            box-shadow: 0 0 35px rgba(168, 85, 247, 0.3);
+        }
+
+        .corner-accent::before, .corner-accent::after {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+        .corner-accent::before {
+            top: -1px; left: -1px;
+            border-top: 2.5px solid #a855f7;
+            border-left: 2.5px solid #a855f7;
+        }
+        .corner-accent::after {
+            bottom: -1px; right: -1px;
+            border-bottom: 2.5px solid #a855f7;
+            border-right: 2.5px solid #a855f7;
+        }
+
+        .glow-title {
+            text-shadow: 0 0 12px rgba(168, 85, 247, 0.8), 0 0 24px rgba(168, 85, 247, 0.5);
+        }
+
+        .active-event-card {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.25) 0%, rgba(15, 5, 25, 0.95) 100%);
+            border-left: 5px solid #a855f7 !important;
+            box-shadow: 0 0 25px rgba(168, 85, 247, 0.35);
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 1; filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.9)); transform: scale(1); }
+            50% { opacity: 0.5; filter: drop-shadow(0 0 2px rgba(168, 85, 247, 0.3)); transform: scale(0.95); }
+        }
+        .live-pulse-dot {
+            animation: pulse-glow 1.5s infinite ease-in-out;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        .animate-marquee {
+            display: inline-block;
+            white-space: nowrap;
+            animation: marquee 26s linear infinite;
+        }
+        .animate-marquee:hover {
+            animation-play-state: paused;
+        }
+
+        .progress-ring-circle {
+            transition: stroke-dashoffset 0.1s linear;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: #05020a; }
+        ::-webkit-scrollbar-thumb { background: #2a0c3d; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #a855f7; }
+    </style>
+</head>
+<body class="min-h-screen bg-cyber-bg ambient-glow-bg text-cyber-text relative flex flex-col justify-between overflow-x-hidden border-t-2 border-cyber-red">
+
+    <canvas id="cyber-canvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
+
+    <div class="fixed inset-0 flex items-center justify-center pointer-events-none z-0 opacity-5 select-none overflow-hidden">
+        <h1 class="font-orbitron text-[15vw] font-black tracking-widest text-cyber-red whitespace-nowrap transform -rotate-12 uppercase">
+            CYBER LYNX
+        </h1>
+    </div>
+
+    <div class="relative z-10 flex flex-col min-h-screen p-3 md:p-5 space-y-4 max-w-[1800px] mx-auto w-full">
+
+        <header class="cyber-card corner-accent rounded-xl p-4 border-cyber-red/40 flex flex-col lg:flex-row items-center justify-between gap-4 relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyber-red to-transparent"></div>
+
+            <div class="flex items-center gap-4 w-full lg:w-auto justify-between lg:justify-start">
+                <div class="flex items-center gap-3">
+                    <!-- LOGO CONTAINER 1 -->
+                    <div class="w-12 h-12 rounded-lg border-2 border-cyber-red bg-black/80 flex items-center justify-center p-1 shadow-lg shadow-cyber-red/30 relative group cursor-pointer overflow-hidden" onclick="triggerAudio('click')">
+                        <img src="bcc.jpg" alt="Campus Connect Logo" class="w-full h-full object-contain transform group-hover:scale-110 transition-transform" />
+                    </div>
+                    <!-- LOGO CONTAINER 2 (ADDED) -->
+                    <div class="w-12 h-12 rounded-lg border-2 border-cyber-red bg-black/80 flex items-center justify-center p-1 shadow-lg shadow-cyber-red/30 relative group cursor-pointer overflow-hidden" onclick="triggerAudio('click')">
+                        <img src="IS.jpg" alt="Secondary Logo" class="w-full h-full object-contain transform group-hover:scale-110 transition-transform" />
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="bg-cyber-red/20 border border-cyber-red/60 text-cyber-red text-[10px] font-orbitron px-2 py-0.5 rounded tracking-wider uppercase font-bold">IS DEPT BOARD</span>
+                            <span class="text-xs text-cyber-muted font-rajdhani font-bold">SYS ONLINE</span>
+                        </div>
+                        <h1 class="font-orbitron font-black text-2xl md:text-3xl text-white tracking-wider glow-title uppercase">
+                            CAMPUS<span class="text-cyber-red">CONNECT</span>
+                        </h1>
+                    </div>
+                </div>
+
+                <div class="hidden sm:flex bg-black/70 border border-cyber-border p-1 rounded-lg gap-1">
+                    <button id="btn-hallway" onclick="setPortalView('hallway')" class="px-3.5 py-1.5 rounded text-xs font-orbitron font-semibold tracking-wide transition-all bg-cyber-red text-white shadow-md shadow-cyber-red/30 flex items-center gap-2">
+                        <i class="fa-solid fa-tv text-xs"></i> HALLWAY DISPLAY
+                    </button>
+                    <button id="btn-student" onclick="redirectToLogin()" class="group px-3.5 py-1.5 rounded text-xs font-orbitron font-semibold tracking-wide transition-all text-cyber-muted hover:text-white hover:bg-cyber-red/20 flex items-center gap-2 border border-transparent hover:border-cyber-red/40">
+                        <i class="fa-solid fa-user-graduate text-xs"></i>
+                        <span>STUDENT PORTAL</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="hidden xl:flex flex-col items-center justify-center text-center px-4">
+                <span class="font-rajdhani text-cyber-red text-sm font-bold tracking-[0.25em] uppercase glow-title">
+                    " IS DEPARTMENT • DIGITAL BULLETIN BOARD "
+                </span>
+                <p class="text-[11px] text-cyber-muted tracking-widest font-medium uppercase mt-0.5">
+                    IRACC • BCC 
+                </p>
+            </div>
+
+            <div class="flex items-center justify-between lg:justify-end w-full lg:w-auto gap-4 border-t lg:border-t-0 border-cyber-border pt-3 lg:pt-0">
+                <button id="audio-toggle" onclick="toggleAudioMute()" class="w-10 h-10 rounded-lg bg-black/60 border border-cyber-border hover:border-cyber-red text-cyber-muted hover:text-cyber-red flex items-center justify-center transition-all" title="Toggle Sci-Fi Audio FX">
+                    <i id="audio-icon" class="fa-solid fa-volume-high text-sm"></i>
+                </button>
+
+                <div onclick="cycleWeather()" class="flex items-center gap-3 bg-black/60 border border-cyber-border hover:border-cyber-red px-3 py-1.5 rounded-lg cursor-pointer transition-all">
+                    <i id="weather-icon" class="fa-solid fa-sun text-amber-400 text-xl live-pulse-dot"></i>
+                    <div>
+                        <div id="weather-temp" class="text-xs font-orbitron font-bold text-white flex items-center gap-1">
+                            72°F <span id="weather-cond" class="text-[10px] text-cyber-muted font-normal">SUNNY</span>
+                        </div>
+                        <div class="text-[9px] text-cyber-muted font-mono uppercase">CAMPUS WEATHER</div>
+                    </div>
+                </div>
+
+                <div class="text-right">
+                    <div id="live-clock" class="font-orbitron font-black text-2xl md:text-3xl text-white tracking-wider glow-title leading-none">
+                        08:30:00 PM
+                    </div>
+                    <div id="live-date" class="font-rajdhani text-xs font-bold text-cyber-red tracking-widest uppercase mt-1">
+                        WEDNESDAY, SEP 30, 2026
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="grid grid-cols-1 lg:grid-cols-12 gap-5 flex-1">
+
+            <section class="lg:col-span-8 flex flex-col space-y-4">
+                <div class="cyber-card corner-accent rounded-xl p-5 md:p-6 flex-1 flex flex-col justify-between relative overflow-hidden group min-h-[440px]">
+                    
+                    <!-- DYNAMIC BACKGROUND IMAGE CONTAINER -->
+                    <div id="card-bg-image" class="absolute inset-0 bg-cover bg-center transition-all duration-700 opacity-25 group-hover:opacity-35 pointer-events-none z-0"></div>
+                    <!-- OVERLAY GRADIENT TO ENSURE READABILITY -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-transparent pointer-events-none z-0"></div>
+
+                    <div class="absolute -right-10 -bottom-10 opacity-10 pointer-events-none transform rotate-12 group-hover:opacity-20 transition-all duration-700 z-0">
+                        <i id="card-bg-icon" class="fa-solid fa-flask text-[320px] text-cyber-red transition-all duration-500"></i>
+                    </div>
+
+                    <div class="relative z-10">
+                        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                            <div class="flex flex-wrap items-center gap-1.5 bg-black/60 border border-cyber-border p-1 rounded-lg">
+                                <button onclick="setCategoryFilter('ALL')" class="cat-filter-btn px-3 py-1 rounded text-xs font-orbitron bg-cyber-red text-white shadow-sm shadow-cyber-red/40 transition-all">ALL</button>
+                                <button onclick="setCategoryFilter('ACADEMIC')" class="cat-filter-btn px-3 py-1 rounded text-xs font-orbitron text-cyber-muted hover:text-white transition-all">ACADEMIC</button>
+                                <button onclick="setCategoryFilter('ATHLETICS')" class="cat-filter-btn px-3 py-1 rounded text-xs font-orbitron text-cyber-muted hover:text-white transition-all">ATHLETICS</button>
+                                <button onclick="setCategoryFilter('EVENTS')" class="cat-filter-btn px-3 py-1 rounded text-xs font-orbitron text-cyber-muted hover:text-white transition-all">EVENTS</button>
+                                <button onclick="setCategoryFilter('URGENT')" class="cat-filter-btn px-3 py-1 rounded text-xs font-orbitron text-cyber-muted hover:text-white transition-all">URGENT</button>
+                            </div>
+
+                            <div class="flex items-center gap-3">
+                                <button id="play-pause-btn" onclick="toggleAutoAdvance()" class="w-8 h-8 rounded border border-cyber-border hover:border-cyber-red text-cyber-muted hover:text-white flex items-center justify-center transition-all">
+                                    <i id="play-pause-icon" class="fa-solid fa-pause text-xs"></i>
+                                </button>
+
+                                <div class="relative w-8 h-8 flex items-center justify-center">
+                                    <svg class="w-8 h-8">
+                                        <circle class="text-cyber-border" stroke-width="2.5" stroke="currentColor" fill="transparent" r="12" cx="16" cy="16"/>
+                                        <circle id="progress-ring" class="progress-ring-circle text-cyber-red" stroke-width="2.5" stroke-dasharray="75.39" stroke-dashoffset="0" stroke-linecap="round" stroke="currentColor" fill="transparent" r="12" cx="16" cy="16"/>
+                                    </svg>
+                                    <span id="carousel-count" class="absolute font-mono text-[10px] font-bold text-white">1/5</span>
+                                </div>
+
+                                <div class="flex items-center gap-1 bg-black/60 border border-cyber-border p-1 rounded-lg">
+                                    <button onclick="prevAnnouncement()" class="w-7 h-7 rounded hover:bg-cyber-red/30 text-white flex items-center justify-center transition-all">
+                                        <i class="fa-solid fa-chevron-left text-xs"></i>
+                                    </button>
+                                    <button onclick="nextAnnouncement()" class="w-7 h-7 rounded hover:bg-cyber-red/30 text-white flex items-center justify-center transition-all">
+                                        <i class="fa-solid fa-chevron-right text-xs"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="card-content-box" class="space-y-4 mt-6 transition-all duration-300">
+                            <div class="flex items-center gap-2">
+                                <span id="card-category-badge" class="bg-cyber-red/20 border border-cyber-red text-cyber-red px-3 py-1 rounded-md font-orbitron text-xs font-bold tracking-wider uppercase flex items-center gap-2 shadow-sm shadow-cyber-red/30">
+                                    <i id="card-badge-icon" class="fa-solid fa-triangle-exclamation"></i> <span id="card-category-text">URGENT</span>
+                                </span>
+                                <span id="card-posted-date" class="bg-black/60 border border-cyber-border text-cyber-muted px-2.5 py-1 rounded-md font-mono text-[11px]">
+                                    POSTED: LIVE NOW
+                                </span>
+                            </div>
+
+                            <h2 id="card-title" class="font-orbitron font-black text-3xl md:text-4xl text-white tracking-wide leading-tight glow-title">
+                                MIDTERM EXAMINATION SCHEDULE & CLEARANCE
+                            </h2>
+                            <p id="card-description" class="text-cyber-text text-base md:text-lg leading-relaxed max-w-3xl font-normal opacity-90">
+                                Official Midterm Exam schedules for ACT and BSIS are now available. All students are advised to secure their examination permits from the ACCESS Office prior to exam week.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 pt-4 border-t border-cyber-border/80 flex flex-wrap items-end justify-between gap-4 relative z-10">
+                        <div class="space-y-2">
+                            <div class="flex flex-wrap items-center gap-4 text-xs font-rajdhani text-cyber-muted font-semibold tracking-wide">
+                                <span><i class="fa-solid fa-location-dot text-cyber-red mr-1"></i> LOCATION: <strong id="card-location" class="text-white">ACCESS Office, IS Dept</strong></span>
+                                <span><i class="fa-solid fa-clock text-cyber-red mr-1"></i> DEADLINE: <strong id="card-deadline" class="text-white">OCT 12, 5:00 PM</strong></span>
+                            </div>
+
+                            <div class="flex items-center gap-2 pt-1">
+                                <button onclick="toggleBookmarkCurrent()" id="bookmark-btn" class="px-3 py-1.5 rounded bg-black/60 border border-cyber-border hover:border-cyber-red text-cyber-muted hover:text-white text-xs font-orbitron flex items-center gap-1.5 transition-all">
+                                    <i class="fa-regular fa-bookmark"></i> SAVE NOTICE
+                                </button>
+                                <button onclick="openQRModal()" class="px-3 py-1.5 rounded bg-black/60 border border-cyber-border hover:border-cyber-red text-cyber-muted hover:text-white text-xs font-orbitron flex items-center gap-1.5 transition-all">
+                                    <i class="fa-solid fa-qrcode"></i> QR PORTAL
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-3">
+                            <div onclick="openQRModal()" class="bg-black border border-cyber-red/50 p-2 rounded-lg flex items-center gap-3 shadow-md shadow-cyber-red/10 cursor-pointer hover:border-cyber-red transition-all">
+                                <div class="w-12 h-12 bg-white p-1 rounded flex items-center justify-center overflow-hidden">
+                                    <img src="qr.jpg" alt="Portal QR Code" class="w-full h-full object-contain" />
+                                </div>
+                                <div class="text-left hidden sm:block">
+                                    <div class="text-[10px] font-mono text-cyber-muted uppercase">SCAN MOBILE</div>
+                                    <div class="text-xs font-orbitron font-bold text-white">ACCESS PORTAL</div>
+                                </div>
+                            </div>
+
+                            <button onclick="openDetailModal()" class="px-5 py-3 rounded-lg bg-cyber-red hover:bg-cyber-redglow text-white font-orbitron font-bold text-xs tracking-wider shadow-lg shadow-cyber-red/40 hover:shadow-cyber-red/60 transition-all flex items-center gap-2 group">
+                                ENTER PORTAL <i class="fa-solid fa-arrow-right transform group-hover:translate-x-1 transition-transform"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div onclick="openModalById(101)" class="cyber-card rounded-xl p-4 border-l-4 border-l-cyber-red flex items-start gap-3 cursor-pointer hover:bg-black/80 transition-all">
+                        <div class="w-10 h-10 rounded bg-cyber-red/10 border border-cyber-red/30 flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-triangle-exclamation text-cyber-red text-lg"></i>
+                        </div>
+                        <div>
+                            <span class="text-[10px] font-orbitron font-bold text-cyber-red tracking-wider uppercase">CAMPUS ALERT</span>
+                            <h4 class="font-orbitron font-bold text-sm text-white mt-0.5">Suicide Prevention Month</h4>
+                            <p class="text-xs text-cyber-muted mt-1 leading-snug">Suicide prevention month shouldn't limit to a single month in September. Empathy is an ongoing action.</p>
+                        </div>
+                    </div>
+
+                    <div onclick="openModalById(102)" class="cyber-card rounded-xl p-4 border-l-4 border-l-cyan-400 flex items-start gap-3 cursor-pointer hover:bg-black/80 transition-all">
+                        <div class="w-10 h-10 rounded bg-cyan-400/10 border border-cyan-400/30 flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-laptop-code text-cyan-400 text-lg"></i>
+                        </div>
+                        <div>
+                            <span class="text-[10px] font-orbitron font-bold text-cyan-400 tracking-wider uppercase">FILM FESTIVAL 2026</span>
+                            <h4 class="font-orbitron font-bold text-sm text-white mt-0.5">IS Film Registration</h4>
+                            <p class="text-xs text-cyber-muted mt-1 leading-snug">Please be guided with the official schedule for the Film Festival 2026.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <aside class="lg:col-span-4 flex flex-col space-y-4">
+                <div class="cyber-card corner-accent rounded-xl p-4 md:p-5 flex-1 flex flex-col justify-between border-cyber-red/30 relative">
+                    <div>
+                        <div class="flex items-center justify-between border-b border-cyber-border pb-3 mb-4">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-cyber-red live-pulse-dot"></span>
+                                <h3 class="font-orbitron font-bold text-sm tracking-wider text-white uppercase">HAPPENING NOW</h3>
+                            </div>
+                            <span class="text-[10px] font-mono text-cyber-red bg-cyber-red/10 px-2 py-0.5 rounded border border-cyber-red/40 uppercase font-bold animate-pulse">
+                                LIVE TIMELINE
+                            </span>
+                        </div>
+
+                        <!-- Dynamic Timeline Container -->
+                        <div id="happening-now-container" class="space-y-3.5">
+                            <!-- Dynamically generated via JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </main>
+
+        <div class="cyber-card rounded-lg p-2 border-cyber-red/40 flex items-center gap-3 overflow-hidden">
+            <div class="bg-cyber-red text-white text-[10px] font-orbitron font-bold px-3 py-1 rounded shrink-0 flex items-center gap-1.5 shadow-sm shadow-cyber-red/50">
+                <i class="fa-solid fa-bullhorn live-pulse-dot"></i> FLASH NEWS
+            </div>
+            <div class="overflow-hidden whitespace-nowrap flex-1 relative font-rajdhani text-sm font-semibold text-white">
+                <div id="bulletin-ticker" class="animate-marquee inline-block space-x-12">
+                    <span>🚨 <strong class="text-cyber-red">NEW ANNOUNCEMENT:</strong> Midterm Examination schedule and clearance requirements posted!</span>
+                    <span>📢 <strong class="text-cyber-red">ACT-BSIS SHIRT:</strong> 2nd Batch ordering starts Monday at ACCESS Office.</span>
+                    <span>🏆 <strong class="text-amber-400">IS DEPARTMENT:</strong> Cyber Lynx team takes 1st place in Sports Fest 2026!</span>
+                    <span>🎬 <strong class="text-cyan-400">REMINDER:</strong> Submit your Film Festival entry link.</span>
+                </div>
+            </div>
+        </div>
+
+        <footer class="cyber-card rounded-xl p-3 px-4 border-cyber-red/30 flex flex-col md:flex-row items-center justify-between text-xs text-cyber-muted gap-2">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                <span class="font-orbitron font-semibold text-white">CAMPUS CONNECT SYSTEM ACTIVE</span>
+                <span class="hidden md:inline text-cyber-border">|</span>
+                <span class="hidden md:inline">IS DEPARTMENT DIGITAL BULLETIN BOARD</span>
+            </div>
+            <div class="font-mono text-[11px] flex items-center gap-4">
+                <span>TERMINAL ID: <strong class="text-cyber-red">HALLWAY-01</strong></span>
+                <span>STATUS: <strong class="text-emerald-400">NOMINAL</strong></span>
+            </div>
+        </footer>
+    </div>
+
+    <div id="detail-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="cyber-card corner-accent rounded-2xl max-w-xl w-full p-6 space-y-5 border-cyber-red shadow-2xl relative">
+            <button onclick="closeModal('detail-modal')" class="absolute top-4 right-4 w-8 h-8 rounded-full border border-cyber-border hover:border-cyber-red text-cyber-muted hover:text-white flex items-center justify-center">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="flex items-center gap-2">
+                <span id="modal-cat-badge" class="bg-cyber-red text-white text-[10px] font-orbitron font-bold px-2.5 py-1 rounded">PORTAL ACTION</span>
+                <span class="text-xs font-mono text-cyber-muted">IS BULLETIN NOTICE</span>
+            </div>
+
+            <h3 id="modal-title" class="font-orbitron font-black text-2xl text-white">Announcement Details</h3>
+
+            <p id="modal-desc" class="text-sm text-cyber-text leading-relaxed">
+                Loading description...
+            </p>
+
+            <div class="bg-black/70 p-4 rounded-xl border border-cyber-border space-y-2 text-xs font-mono">
+                <div class="flex justify-between">
+                    <span class="text-cyber-muted">LOCATION:</span>
+                    <span id="modal-loc" class="text-white font-bold">ACCESS Office</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-cyber-muted">DEADLINE:</span>
+                    <span id="modal-dl" class="text-cyber-red font-bold">OCT 12, 5:00 PM</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-cyber-muted">ORGANIZER:</span>
+                    <span class="text-white">ACCESS OFFICER / IS DEPT</span>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-3 pt-2">
+                <button onclick="closeModal('detail-modal')" class="px-4 py-2 rounded-lg border border-cyber-border hover:border-cyber-red text-xs font-orbitron text-cyber-muted hover:text-white">
+                    CLOSE
+                </button>
+                <button onclick="closeModal('detail-modal');" class="px-5 py-2 rounded-lg bg-cyber-red hover:bg-cyber-redglow text-white text-xs font-orbitron font-bold shadow-lg shadow-cyber-red/40">
+                    OPEN IN PORTAL
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="qr-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="cyber-card corner-accent rounded-2xl max-w-sm w-full p-6 text-center space-y-4 border-cyber-red relative">
+            <button onclick="closeModal('qr-modal')" class="absolute top-4 right-4 w-8 h-8 rounded-full border border-cyber-border hover:border-cyber-red text-cyber-muted hover:text-white flex items-center justify-center">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="text-xs font-orbitron font-bold text-cyber-red tracking-widest uppercase">MOBILE CONNECT</div>
+            <h3 class="font-orbitron font-extrabold text-xl text-white">SCAN TO SYNC</h3>
+
+            <div class="w-48 h-48 mx-auto bg-white p-3 rounded-xl shadow-lg shadow-cyber-red/30 relative flex items-center justify-center border-4 border-cyber-red overflow-hidden">
+                <img src="qr.jpg" alt="Portal QR Code" class="w-full h-full object-contain" />
+            </div>
+
+            <p class="text-xs text-cyber-muted font-mono">
+                Scan with your phone camera to view schedule & notices directly on your mobile device.
+            </p>
+
+            <button onclick="closeModal('qr-modal')" class="w-full py-2.5 rounded-lg bg-cyber-red text-white text-xs font-orbitron font-bold shadow-md shadow-cyber-red/40">
+                DONE
+            </button>
+        </div>
+    </div>
+
+    <div id="event-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="cyber-card corner-accent rounded-2xl max-w-md w-full p-6 space-y-4 border-cyber-red relative">
+            <button onclick="closeModal('event-modal')" class="absolute top-4 right-4 w-8 h-8 rounded-full border border-cyber-border hover:border-cyber-red text-cyber-muted hover:text-white flex items-center justify-center">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <span class="bg-cyan-950 border border-cyan-500/50 text-cyan-400 text-[10px] font-orbitron px-2.5 py-1 rounded font-bold">EVENT DETAILS</span>
+            <h3 id="event-modal-title" class="font-orbitron font-black text-2xl text-white">AP Chemistry</h3>
+
+            <div class="bg-black/60 p-4 rounded-xl border border-cyber-border space-y-3 text-xs font-mono">
+                <div class="flex items-center justify-between">
+                    <span class="text-cyber-muted"><i class="fa-solid fa-location-dot text-cyber-red mr-1"></i> ROOM:</span>
+                    <span id="event-modal-room" class="text-white font-bold">Room 302</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-cyber-muted"><i class="fa-solid fa-user text-cyber-red mr-1"></i> INSTRUCTOR:</span>
+                    <span id="event-modal-instructor" class="text-white font-bold">Mr. Harrington</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-cyber-muted"><i class="fa-solid fa-clock text-cyber-red mr-1"></i> TIME:</span>
+                    <span id="event-modal-time" class="text-cyan-400 font-bold">11:15 AM - 12:05 PM</span>
+                </div>
+            </div>
+
+            <button onclick="closeModal('event-modal');" class="w-full py-2.5 rounded-lg bg-cyber-red text-white text-xs font-orbitron font-bold shadow-md shadow-cyber-red/40">
+                ADD TO MY CALENDAR
+            </button>
+        </div>
+    </div>
+
+    <script src="announcement-sync.js"></script>
+    <script>
+        let announcements = [];
+        let lastBulletinSignature = null;
+        let cardRenderTimer = null;
+
+        // Dynamic Schedule Data with current time windows
+        const scheduleData = [
+            {
+                title: "Apps Development Lab",
+                room: "Computer Lab 3",
+                instructor: "Ms. Law",
+                startTime: "08:00",
+                endTime: "11:00",
+                displayTime: "08:00 AM - 11:00 AM",
+                type: "PERIOD 1",
+                theme: "cyan"
+            },
+            {
+                title: "Philippine Constitution",
+                room: "Room 7",
+                instructor: "Atty. Salem",
+                startTime: "11:00",
+                endTime: "14:00",
+                displayTime: "11:00 AM - 02:00 PM",
+                type: "PERIOD 2",
+                theme: "red"
+            },
+            {
+                title: "Information Security Seminar",
+                room: "AVR Studio, IS Bldg",
+                instructor: "Prof. Del Rosario",
+                startTime: "14:00",
+                endTime: "17:00",
+                displayTime: "02:00 PM - 05:00 PM",
+                type: "PERIOD 3",
+                theme: "purple"
+            },
+            {
+                title: "Varsity Practice & Drills",
+                room: "Activity Center",
+                instructor: "Coach Davis",
+                startTime: "17:00",
+                endTime: "21:00",
+                displayTime: "05:00 PM - 09:00 PM",
+                type: "AFTER HOURS",
+                subType: "SPORTS",
+                icon: "fa-basketball",
+                theme: "amber"
+            },
+            {
+                title: "Cyber Lynx Lab Access",
+                room: "IS Innovation Hub",
+                instructor: "Dept. Officers",
+                startTime: "21:00",
+                endTime: "23:59",
+                displayTime: "09:00 PM - 11:59 PM",
+                type: "NIGHT SESSION",
+                theme: "cyan"
+            }
+        ];
+
+        let currentIndex = 0;
+        let activeCategory = 'ALL';
+        let autoAdvance = true;
+        const AUTO_INTERVAL = 7000;
+        let countdownStepInterval = null;
+        let isMuted = false;
+
+        let audioCtx = null;
+        function getAudioContext() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            return audioCtx;
+        }
+
+        function triggerAudio(type) {
+            if (isMuted) return;
+            try {
+                const ctx = getAudioContext();
+                if (ctx.state === 'suspended') {
+                    ctx.resume();
+                }
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                if (type === 'click') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(800, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(400, ctx.currentTime + 0.05);
+                    gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.05);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.05);
+                } else if (type === 'slide') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(300, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(600, ctx.currentTime + 0.08);
+                    gain.gain.setValueAtTime(0.08, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.08);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.08);
+                }
+            } catch(e) {}
+        }
+
+        function redirectToLogin() {
+            window.location.href = 'student-login.html';
+        }
+
+        function toggleAudioMute() {
+            isMuted = !isMuted;
+            const icon = document.getElementById('audio-icon');
+            const btn = document.getElementById('audio-toggle');
+            if (isMuted) {
+                icon.className = "fa-solid fa-volume-xmark text-sm text-cyber-muted";
+                btn.classList.add('border-cyber-border');
+            } else {
+                icon.className = "fa-solid fa-volume-high text-sm text-cyber-red";
+                btn.classList.add('border-cyber-red');
+                triggerAudio('click');
+            }
+        }
+
+        function getFilteredAnnouncements() {
+            if (activeCategory === 'ALL') return announcements;
+            return announcements.filter(a => a.category === activeCategory);
+        }
+
+        function renderCard() {
+            clearTimeout(cardRenderTimer);
+            const list = getFilteredAnnouncements();
+            if (list.length === 0) {
+                clearInterval(countdownStepInterval);
+                document.getElementById('card-content-box').style.opacity = '1';
+                document.getElementById('card-content-box').style.transform = 'none';
+                document.getElementById('card-title').textContent = announcements.length ? 'NO ANNOUNCEMENTS IN THIS CATEGORY' : 'NO LIVE ANNOUNCEMENTS';
+                document.getElementById('card-description').textContent = announcements.length ? 'Choose another category to view the current hallway notices.' : 'The hallway display is waiting for announcements from the administrator.';
+                document.getElementById('card-category-text').textContent = announcements.length ? activeCategory : 'BOARD READY';
+                document.getElementById('card-location').textContent = '';
+                document.getElementById('card-deadline').textContent = '';
+                document.getElementById('card-posted-date').textContent = 'HALLWAY DISPLAY';
+                document.getElementById('carousel-count').textContent = '0/0';
+                document.getElementById('card-bg-image').style.backgroundImage = 'none';
+                document.getElementById('progress-ring').style.strokeDashoffset = 75.39;
+                return;
+            }
+
+            if (currentIndex >= list.length) currentIndex = 0;
+            if (currentIndex < 0) currentIndex = list.length - 1;
+
+            const item = list[currentIndex];
+
+            const contentBox = document.getElementById('card-content-box');
+            contentBox.style.opacity = '0';
+            contentBox.style.transform = 'translateY(6px)';
+
+            cardRenderTimer = setTimeout(() => {
+                document.getElementById('card-title').textContent = item.title;
+                document.getElementById('card-description').textContent = item.description;
+                document.getElementById('card-category-text').textContent = item.category;
+                document.getElementById('card-location').textContent = item.location;
+                document.getElementById('card-deadline').textContent = item.deadline;
+                document.getElementById('card-posted-date').textContent = `POSTED: ${item.posted}`;
+                document.getElementById('carousel-count').textContent = `${currentIndex + 1}/${list.length}`;
+                
+                // UPDATE BACKGROUND IMAGE DYNAMICALLY
+                const bgBox = document.getElementById('card-bg-image');
+                if (item.bgImage) {
+                    bgBox.style.backgroundImage = `url("${item.bgImage.replace(/["\\)]/g, '')}")`;
+                } else {
+                    bgBox.style.backgroundImage = 'none';
+                }
+
+                document.getElementById('card-badge-icon').className = `fa-solid ${item.badgeIcon}`;
+                document.getElementById('card-bg-icon').className = `fa-solid ${item.icon} text-[320px] text-cyber-red transition-all duration-500`;
+
+                contentBox.style.opacity = '1';
+                contentBox.style.transform = 'translateY(0)';
+            }, 150);
+
+            resetProgressRing();
+        }
+
+        function resetProgressRing() {
+            clearInterval(countdownStepInterval);
+            const ring = document.getElementById('progress-ring');
+            const circumference = 75.39;
+
+            if (getFilteredAnnouncements().length === 0) {
+                ring.style.strokeDashoffset = circumference;
+                return;
+            }
+
+            if (!autoAdvance) {
+                ring.style.strokeDashoffset = circumference;
+                return;
+            }
+
+            const stepMs = 100;
+            const totalSteps = AUTO_INTERVAL / stepMs;
+            let currentStep = 0;
+
+            countdownStepInterval = setInterval(() => {
+                currentStep++;
+                const progress = currentStep / totalSteps;
+                ring.style.strokeDashoffset = circumference * (1 - progress);
+
+                if (currentStep >= totalSteps) {
+                    clearInterval(countdownStepInterval);
+                    nextAnnouncement(true);
+                }
+            }, stepMs);
+        }
+
+        function nextAnnouncement(auto = false) {
+            const list = getFilteredAnnouncements();
+            if (!list.length) return;
+            currentIndex = (currentIndex + 1) % list.length;
+            if (!auto) triggerAudio('slide');
+            renderCard();
+        }
+
+        function prevAnnouncement() {
+            const list = getFilteredAnnouncements();
+            if (!list.length) return;
+            currentIndex = (currentIndex - 1 + list.length) % list.length;
+            triggerAudio('slide');
+            renderCard();
+        }
+
+        function toggleAutoAdvance() {
+            autoAdvance = !autoAdvance;
+            const icon = document.getElementById('play-pause-icon');
+            if (autoAdvance) {
+                icon.className = "fa-solid fa-pause text-xs";
+                resetProgressRing();
+            } else {
+                icon.className = "fa-solid fa-play text-xs";
+                clearInterval(countdownStepInterval);
+                document.getElementById('progress-ring').style.strokeDashoffset = 75.39;
+            }
+            triggerAudio('click');
+        }
+
+        function setCategoryFilter(cat) {
+            activeCategory = cat;
+            currentIndex = 0;
+            triggerAudio('click');
+
+            const buttons = document.querySelectorAll('.cat-filter-btn');
+            buttons.forEach(btn => {
+                if (btn.textContent === cat) {
+                    btn.className = "cat-filter-btn px-3 py-1 rounded text-xs font-orbitron bg-cyber-red text-white shadow-sm shadow-cyber-red/40 transition-all";
+                } else {
+                    btn.className = "cat-filter-btn px-3 py-1 rounded text-xs font-orbitron text-cyber-muted hover:text-white transition-all";
+                }
+            });
+
+            renderCard();
+        }
+
+        async function loadHallwayAnnouncements() {
+            try {
+                const response = await fetch('conn.php?action=hallway_bulletin', { cache: 'no-store' });
+                if (!response.ok) throw new Error('Bulletin unavailable');
+                const data = await response.json();
+                const nextSlides = Array.isArray(data.config?.announcements) ? data.config.announcements : [];
+                const signature = JSON.stringify(nextSlides);
+                if (signature === lastBulletinSignature) return;
+                const currentId = getFilteredAnnouncements()[currentIndex]?.id;
+                const changedSlide = nextSlides.find(slide => {
+                    const previous = announcements.find(item => item.id === slide.id);
+                    return !previous || JSON.stringify(previous) !== JSON.stringify(slide);
+                });
+                announcements = nextSlides;
+                lastBulletinSignature = signature;
+                const filtered = getFilteredAnnouncements();
+                const preferredId = changedSlide && filtered.some(slide => slide.id === changedSlide.id) ? changedSlide.id : currentId;
+                const preferredIndex = filtered.findIndex(slide => slide.id === preferredId);
+                currentIndex = preferredIndex >= 0 ? preferredIndex : 0;
+                renderCard();
+                const ticker = document.getElementById('bulletin-ticker');
+                ticker.replaceChildren();
+                announcements.forEach(item => {
+                    const message = document.createElement('span');
+                    const label = document.createElement('strong');
+                    label.className = 'text-cyber-red';
+                    label.textContent = item.category + ': ';
+                    message.append(label, document.createTextNode(item.title));
+                    ticker.appendChild(message);
+                });
+            } catch (error) {
+                lastBulletinSignature = null;
+                clearTimeout(cardRenderTimer);
+                clearInterval(countdownStepInterval);
+                document.getElementById('card-content-box').style.opacity = '1';
+                document.getElementById('card-title').textContent = 'HALLWAY BOARD OFFLINE';
+                document.getElementById('card-description').textContent = 'The live bulletin could not be reached. Please check the server connection.';
+            }
+        }
+
+        function toggleBookmarkCurrent() {
+            const btn = document.getElementById('bookmark-btn');
+            triggerAudio('click');
+            if (btn.classList.contains('text-cyber-red')) {
+                btn.classList.remove('text-cyber-red', 'border-cyber-red');
+                btn.innerHTML = `<i class="fa-regular fa-bookmark"></i> SAVE NOTICE`;
+            } else {
+                btn.classList.add('text-cyber-red', 'border-cyber-red');
+                btn.innerHTML = `<i class="fa-solid fa-bookmark text-cyber-red"></i> SAVED`;
+            }
+        }
+
+        function parseTimeToMinutes(timeStr) {
+            const [h, m] = timeStr.split(':').map(Number);
+            return h * 60 + m;
+        }
+
+        // Highlight Active Happening Event in Timeline
+        function updateHappeningNow() {
+            const now = new Date();
+            const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+            const container = document.getElementById('happening-now-container');
+            let html = '';
+
+            let currentFound = false;
+            let nextFound = false;
+
+            scheduleData.forEach((item) => {
+                const startMins = parseTimeToMinutes(item.startTime);
+                const endMins = parseTimeToMinutes(item.endTime);
+
+                if (currentMinutes >= startMins && currentMinutes < endMins) {
+                    // Currently Active Highlighted Event
+                    currentFound = true;
+                    const totalDuration = endMins - startMins;
+                    const elapsed = currentMinutes - startMins;
+                    const remaining = endMins - currentMinutes;
+                    const progressPercent = Math.min(100, Math.max(0, (elapsed / totalDuration) * 100));
+
+                    html += `
+                        <div onclick="showEventDetails('${item.title}', '${item.room}', '${item.instructor}', '${item.displayTime}')" class="active-event-card border border-cyber-red p-4 rounded-r-xl transition-all cursor-pointer relative overflow-hidden group">
+                            <div class="flex items-center justify-between text-[11px] font-orbitron font-extrabold tracking-wider text-cyber-red mb-1">
+                                <span class="flex items-center gap-1.5 bg-cyber-red text-white px-2 py-0.5 rounded shadow-sm shadow-cyber-red">
+                                    <i class="fa-solid fa-circle text-[8px] live-pulse-dot"></i> LIVE ONGOING
+                                </span>
+                                <span class="bg-black/80 text-white px-2 py-0.5 rounded border border-cyber-red/60 text-[10px] font-mono">
+                                    ${remaining} MIN REMAINING
+                                </span>
+                            </div>
+                            <h4 class="font-orbitron font-black text-lg text-white group-hover:text-cyber-red transition-colors mt-2">
+                                ${item.title}
+                            </h4>
+                            <div class="text-xs text-cyber-text font-semibold mt-1 flex justify-between">
+                                <span><i class="fa-solid fa-location-dot text-cyber-red mr-1"></i>${item.room} — ${item.instructor}</span>
+                            </div>
+                            <div class="text-xs font-mono text-cyber-red font-bold mt-1">
+                                TIME: ${item.displayTime}
+                            </div>
+                            <div class="w-full bg-black/80 rounded-full h-2 mt-3 overflow-hidden border border-cyber-red/50">
+                                <div class="bg-gradient-to-r from-cyber-red to-cyber-redglow h-full rounded-full transition-all duration-1000 shadow-md shadow-cyber-red" style="width: ${progressPercent}%;"></div>
+                            </div>
+                        </div>
+                    `;
+                } else if (currentMinutes < startMins && !nextFound) {
+                    // Up Next Event
+                    nextFound = true;
+                    const minsUntil = startMins - currentMinutes;
+
+                    html += `
+                        <div onclick="showEventDetails('${item.title}', '${item.room}', '${item.instructor}', '${item.displayTime}')" class="bg-black/60 border-l-4 border-l-cyan-400 border border-cyber-border p-3.5 rounded-r-lg group hover:border-cyan-400 transition-all cursor-pointer">
+                            <div class="flex items-center justify-between text-[11px] font-orbitron font-bold tracking-wider text-cyan-400 mb-1">
+                                <span><i class="fa-solid fa-forward text-xs mr-1"></i> ${item.type} • UP NEXT</span>
+                                <span class="text-cyan-300 font-mono text-[10px] bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-800/60">
+                                    IN ${minsUntil} MIN
+                                </span>
+                            </div>
+                            <h4 class="font-orbitron font-bold text-base text-white group-hover:text-cyan-300 transition-colors">
+                                ${item.title}
+                            </h4>
+                            <div class="text-xs text-cyber-muted font-medium mt-1 flex justify-between">
+                                <span>${item.room} — ${item.instructor}</span>
+                                <span class="font-mono text-white">${item.displayTime}</span>
+                            </div>
+                        </div>
+                    `;
+                } else if (currentMinutes < startMins) {
+                    // Upcoming Schedule Items
+                    const borderColor = item.theme === 'amber' ? 'border-l-amber-500' : 'border-l-purple-500';
+                    const textColor = item.theme === 'amber' ? 'text-amber-500' : 'text-purple-400';
+                    const hoverColor = item.theme === 'amber' ? 'group-hover:text-amber-400' : 'group-hover:text-purple-300';
+                    const iconHtml = item.icon ? `<i class="fa-solid ${item.icon} text-xs mr-1"></i>` : '';
+
+                    html += `
+                        <div onclick="showEventDetails('${item.title}', '${item.room}', '${item.instructor}', '${item.displayTime}')" class="bg-black/40 border-l-4 ${borderColor} border border-cyber-border p-3 rounded-r-lg group hover:${borderColor} transition-all cursor-pointer">
+                            <div class="flex items-center justify-between text-[11px] font-orbitron font-bold tracking-wider ${textColor} mb-1">
+                                <span class="flex items-center gap-1.5">
+                                    ${iconHtml} ${item.type}
+                                </span>
+                                ${item.subType ? `<span class="font-mono text-[10px] text-cyber-muted">${item.subType}</span>` : ''}
+                            </div>
+                            <h4 class="font-orbitron font-bold text-sm text-white ${hoverColor} transition-colors">
+                                ${item.title}
+                            </h4>
+                            <div class="text-xs text-cyber-muted font-medium mt-1 flex justify-between">
+                                <span>${item.room}</span>
+                                <span class="font-mono text-white">${item.displayTime}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            // Fallback when no schedule is active
+            if (!currentFound) {
+                const defaultActive = scheduleData[3]; // Fallback ongoing view for demo
+                html = `
+                    <div onclick="showEventDetails('${defaultActive.title}', '${defaultActive.room}', '${defaultActive.instructor}', '${defaultActive.displayTime}')" class="active-event-card border border-cyber-red p-4 rounded-r-xl transition-all cursor-pointer relative overflow-hidden group">
+                        <div class="flex items-center justify-between text-[11px] font-orbitron font-extrabold tracking-wider text-cyber-red mb-1">
+                            <span class="flex items-center gap-1.5 bg-cyber-red text-white px-2 py-0.5 rounded shadow-sm shadow-cyber-red">
+                                <i class="fa-solid fa-circle text-[8px] live-pulse-dot"></i> LIVE ONGOING
+                            </span>
+                            <span class="bg-black/80 text-white px-2 py-0.5 rounded border border-cyber-red/60 text-[10px] font-mono">
+                                ACTIVE SESSION
+                            </span>
+                        </div>
+                        <h4 class="font-orbitron font-black text-lg text-white group-hover:text-cyber-red transition-colors mt-2">
+                            ${defaultActive.title}
+                        </h4>
+                        <div class="text-xs text-cyber-text font-semibold mt-1 flex justify-between">
+                            <span><i class="fa-solid fa-location-dot text-cyber-red mr-1"></i>${defaultActive.room} — ${defaultActive.instructor}</span>
+                        </div>
+                        <div class="text-xs font-mono text-cyber-red font-bold mt-1">
+                            TIME: ${defaultActive.displayTime}
+                        </div>
+                        <div class="w-full bg-black/80 rounded-full h-2 mt-3 overflow-hidden border border-cyber-red/50">
+                            <div class="bg-gradient-to-r from-cyber-red to-cyber-redglow h-full rounded-full transition-all duration-1000 shadow-md shadow-cyber-red" style="width: 65%;"></div>
+                        </div>
+                    </div>
+                ` + html;
+            }
+
+            // Tomorrow preview banner
+            html += `
+                <div class="bg-black/30 border-l-4 border-l-gray-600 border border-cyber-border p-3 rounded-r-lg">
+                    <div class="flex items-center justify-between text-[10px] font-orbitron font-bold tracking-wider text-cyber-muted mb-1">
+                        <span>TOMORROW PREVIEW</span>
+                        <span class="font-mono">THU, OCT 01</span>
+                    </div>
+                    <p class="text-xs text-white font-medium">
+                        IS Department Assembly & Midterm Guidelines Briefing
+                    </p>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function updateClock() {
+            const now = new Date();
+            let hours = now.getHours();
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+            const strHours = String(hours).padStart(2, '0');
+
+            document.getElementById('live-clock').textContent = `${strHours}:${minutes}:${seconds} ${ampm}`;
+
+            const options = { weekday: 'LONG', month: 'SHORT', day: 'NUMERIC', year: 'NUMERIC' };
+            document.getElementById('live-date').textContent = now.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase();
+
+            updateHappeningNow();
+        }
+
+        const weatherPresets = [
+            { temp: "72°F", cond: "SUNNY", icon: "fa-sun text-amber-400" },
+            { temp: "68°F", cond: "CLOUDY", icon: "fa-cloud text-gray-300" },
+            { temp: "75°F", cond: "RAIN SHOWER", icon: "fa-cloud-showers-heavy text-cyan-400" }
+        ];
+        let weatherIdx = 0;
+        function cycleWeather() {
+            weatherIdx = (weatherIdx + 1) % weatherPresets.length;
+            const w = weatherPresets[weatherIdx];
+            document.getElementById('weather-temp').innerHTML = `${w.temp} <span id="weather-cond" class="text-[10px] text-cyber-muted font-normal">${w.cond}</span>`;
+            document.getElementById('weather-icon').className = `fa-solid ${w.icon} text-xl live-pulse-dot`;
+            triggerAudio('click');
+        }
+
+        function openDetailModal() {
+            const item = getFilteredAnnouncements()[currentIndex];
+            if (!item) return;
+            document.getElementById('modal-title').textContent = item.title;
+            document.getElementById('modal-desc').textContent = item.description;
+            document.getElementById('modal-loc').textContent = item.location;
+            document.getElementById('modal-dl').textContent = item.deadline;
+            document.getElementById('modal-cat-badge').textContent = item.category;
+            document.getElementById('detail-modal').classList.remove('hidden');
+            triggerAudio('click');
+        }
+
+        function openModalById(id) {
+            if (id === 101) {
+                document.getElementById('modal-title').textContent = "Suicide Prevention Month";
+                document.getElementById('modal-desc').textContent = "Suicide prevention month shouldn't limit to a single month in September. Empathy is an ongoing action.";
+                document.getElementById('modal-loc').textContent = "Taculing Campus";
+                document.getElementById('modal-dl').textContent = "EVERYDAY";
+                document.getElementById('modal-cat-badge').textContent = "CAMPUS ALERT";
+            } else {
+                document.getElementById('modal-title').textContent = "IS Film Festival 2026";
+                document.getElementById('modal-desc').textContent = "Please be guided with the official schedule for the Film Festival 2026.";
+                document.getElementById('modal-loc').textContent = "G-drive Link";
+                document.getElementById('modal-dl').textContent = "FRI, 6:00 PM";
+                document.getElementById('modal-cat-badge').textContent = "FILM FESTIVAL";
+            }
+            document.getElementById('detail-modal').classList.remove('hidden');
+            triggerAudio('click');
+        }
+
+        function openQRModal() {
+            document.getElementById('qr-modal').classList.remove('hidden');
+            triggerAudio('click');
+        }
+
+        function showEventDetails(title, room, instructor, time) {
+            document.getElementById('event-modal-title').textContent = title;
+            document.getElementById('event-modal-room').textContent = room;
+            document.getElementById('event-modal-instructor').textContent = instructor;
+            document.getElementById('event-modal-time').textContent = time;
+            document.getElementById('event-modal').classList.remove('hidden');
+            triggerAudio('click');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+            triggerAudio('click');
+        }
+
+        function setPortalView(view) {
+            const hallwayBtn = document.getElementById('btn-hallway');
+            const studentBtn = document.getElementById('btn-student');
+
+            const activeClass = "px-3.5 py-1.5 rounded text-xs font-orbitron font-semibold tracking-wide transition-all bg-cyber-red text-white shadow-md shadow-cyber-red/30 flex items-center gap-2";
+            const inactiveClass = "px-3.5 py-1.5 rounded text-xs font-orbitron font-semibold tracking-wide transition-all text-cyber-muted hover:text-white hover:bg-cyber-red/20 flex items-center gap-2";
+
+            hallwayBtn.className = view === 'hallway' ? activeClass : inactiveClass;
+            studentBtn.className = view === 'student' ? activeClass : inactiveClass;
+            triggerAudio('click');
+        }
+
+        const canvas = document.getElementById('cyber-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedX = (Math.random() - 0.5) * 0.4;
+                this.speedY = (Math.random() - 0.5) * 0.4;
+                this.alpha = Math.random() * 0.4 + 0.1;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x < 0) this.x = canvas.width;
+                if (this.x > canvas.width) this.x = 0;
+                if (this.y < 0) this.y = canvas.height;
+                if (this.y > canvas.height) this.y = 0;
+            }
+            draw() {
+                ctx.fillStyle = `rgba(168, 85, 247, ${this.alpha})`;
+                ctx.fillRect(this.x, this.y, this.size, this.size);
+            }
+        }
+
+        for (let i = 0; i < 40; i++) {
+            particles.push(new Particle());
+        }
+
+        function animateCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateCanvas);
+        }
+
+        window.onload = function() {
+            setInterval(updateClock, 1000);
+            updateClock();
+            AnnouncementSync.subscribe(['hallway'], loadHallwayAnnouncements);
+            animateCanvas();
+        };
+    </script>
+</body>
+</html>

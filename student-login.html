@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Page</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap');
+
+    :root {
+      --bg-color: #040208;
+      --card-bg: rgba(12, 6, 20, 0.88);
+      --red-accent: #a855f7;
+      --red-glow: rgba(168, 85, 247, 0.3);
+      --input-bg: rgba(22, 16, 29, 0.9);
+      --text-main: #f3e8ff;
+      --text-muted: #a885c7;
+      --border-color: rgba(168, 85, 247, 0.3);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Rajdhani', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow-x: hidden;
+      position: relative;
+      padding: 20px;
+    }
+
+  
+    .cyber-frame {
+      width: 100%;
+      max-width: 450px;
+      background: radial-gradient(circle at 50% 20%, rgba(168, 85, 247, 0.15) 0%, rgba(4, 2, 8, 0.95) 70%);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      position: relative;
+      padding: 40px;
+      box-shadow: 0 0 40px var(--red-glow), inset 0 0 15px rgba(168, 85, 247, 0.12);
+      backdrop-filter: blur(10px);
+      z-index: 2;
+      opacity: 0;
+      transform: translateY(28px) scale(0.82);
+      animation: containerPopup 0.8s cubic-bezier(0.17, 0.67, 0.32, 1.25) forwards;
+    }
+
+    @keyframes containerPopup {
+      0% {
+        opacity: 0;
+        transform: translateY(28px) scale(0.82);
+      }
+      70% {
+        opacity: 1;
+        transform: translateY(-4px) scale(1.03);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .cyber-frame > * {
+      opacity: 0;
+      transform: translateY(14px) scale(0.98);
+      animation: contentOpen 0.5s ease forwards;
+    }
+
+    .cyber-frame > .back-button { animation-delay: 0.35s; }
+    .cyber-frame > .tech-header { animation-delay: 0.45s; }
+    .cyber-frame > .status-message { animation-delay: 0.5s; }
+    .cyber-frame > .auth-tabs { animation-delay: 0.58s; }
+
+    @keyframes contentOpen {
+      from { opacity: 0; transform: translateY(14px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    #register-form,
+    #login-form {
+      animation: formOpen 0.45s ease 0.65s both;
+    }
+
+    #register-form .form-group,
+    #login-form .form-group,
+    #register-form .submit-btn,
+    #login-form .submit-btn,
+    #register-form .form-switch,
+    #login-form .form-switch {
+      opacity: 0;
+      transform: translateY(12px);
+      animation: fieldOpen 0.45s ease forwards;
+    }
+
+    #register-form .form-group:nth-of-type(2) { animation-delay: 0.72s; }
+    #register-form .form-group:nth-of-type(3) { animation-delay: 0.79s; }
+    #register-form .form-group:nth-of-type(4) { animation-delay: 0.86s; }
+    #register-form .form-group:nth-of-type(5) { animation-delay: 0.93s; }
+    #register-form .form-group:nth-of-type(6) { animation-delay: 1s; }
+    #register-form .form-group:nth-of-type(7) { animation-delay: 1.07s; }
+    #register-form .form-group:nth-of-type(8) { animation-delay: 1.14s; }
+    #register-form .submit-btn { animation-delay: 1.21s; }
+    #register-form .form-switch { animation-delay: 1.28s; }
+
+    #login-form .form-group:nth-of-type(1) { animation-delay: 0.72s; }
+    #login-form .form-group:nth-of-type(2) { animation-delay: 0.82s; }
+    #login-form .submit-btn { animation-delay: 0.92s; }
+    #login-form .form-switch { animation-delay: 0.99s; }
+
+    @keyframes formOpen {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes fieldOpen {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+   
+    .cyber-frame::before {
+      content: '';
+      position: absolute;
+      top: -1px;
+      left: -1px;
+      width: 25px;
+      height: 25px;
+      border-top: 2px solid var(--red-accent);
+      border-left: 2px solid var(--red-accent);
+      border-top-left-radius: 16px;
+    }
+
+    .cyber-frame::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      right: -1px;
+      width: 25px;
+      height: 25px;
+      border-bottom: 2px solid var(--red-accent);
+      border-right: 2px solid var(--red-accent);
+      border-bottom-right-radius: 16px;
+    }
+
+    .back-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 30px;
+      color: var(--text-main);
+      background: transparent;
+      border: 1px solid var(--red-accent);
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-decoration: none;
+      text-transform: uppercase;
+      transition: all 0.3s ease;
+      clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+    }
+
+    .back-button:hover {
+      color: var(--text-main);
+      background: var(--red-accent);
+      box-shadow: 0 0 15px var(--red-accent);
+    }
+
+   
+    
+    .auth-tabs {
+      display: flex;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      border-radius: 6px;
+      padding: 4px;
+      margin-bottom: 24px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 10px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+    }
+
+    .tab-btn.active {
+      background: var(--red-accent);
+      color: #fff;
+      box-shadow: 0 0 12px var(--red-glow);
+    }
+
+   
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .form-label {
+      display: block;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    .form-input, .form-select {
+      width: 100%;
+      background-color: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 12px 15px;
+      color: #fff;
+      font-size: 0.95rem;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .form-input::placeholder {
+      color: rgba(255, 255, 255, 0.25);
+    }
+
+    .form-input:focus, .form-select:focus {
+      border-color: var(--red-accent);
+      box-shadow: 0 0 10px var(--red-glow);
+    }
+
+    .form-select {
+      appearance: none;
+      background-image: url("data:image/svg+xml;utf8,<svg fill='%23a855f7' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      cursor: pointer;
+    }
+
+    .form-select option {
+      background-color: #0d0814;
+      color: #fff;
+    }
+
+    
+    .submit-btn {
+      width: 100%;
+      background: #ffffff;
+      color: #000;
+      border: none;
+      padding: 12px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.85rem;
+      font-weight: bold;
+      letter-spacing: 2px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(168, 85, 247, 0.4);
+    }
+
+    .form-switch {
+      color: var(--text-muted);
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .switch-btn {
+      background: none;
+      border: none;
+      color: var(--red-accent);
+      cursor: pointer;
+      font: inherit;
+      font-weight: 700;
+    }
+
+    .switch-btn:hover {
+      text-decoration: underline;
+    }
+
+    
+    .tech-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      font-size: 0.7rem;
+      color: var(--red-accent);
+      letter-spacing: 2px;
+      font-family: 'Orbitron', sans-serif;
+    }
+
+    .status-message {
+      color: var(--text-muted);
+      text-align: center;
+      margin: -12px 0 20px;
+      font-weight: 600;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-delay: 0ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+    @media (max-width: 600px) { body { align-items:flex-start; padding:12px; } .cyber-frame { max-width:none; min-height:calc(100vh - 24px); padding:28px 18px 22px; } .back-button { margin-bottom:22px; } .tech-header { font-size:.62rem; } .tab-btn { padding:9px 5px; font-size:.72rem; } .form-group { margin-bottom:16px; } .form-input,.form-select { font-size:.9rem; padding:11px 12px; } .submit-btn { padding:12px 8px; font-size:.76rem; } }
+  </style>
+</head>
+<body>
+
+  <div class="cyber-frame">
+    <a class="back-button" href="index.html" aria-label="Back to portal selection">
+      <i class="fa-solid fa-arrow-left"></i>
+      <span>Back</span>
+    </a>
+
+    
+    <div class="tech-header">
+      <span>// ACCESS_PORTAL</span>
+      <i class="fa-solid fa-microchip"></i>
+    </div>
+
+    <p class="status-message" id="status-message" role="status" aria-live="polite"></p>
+
+   
+    <div class="auth-tabs">
+      <button type="button" class="tab-btn active" id="sign-in-tab">Sign In</button>
+      <button type="button" class="tab-btn" id="register-tab">Register</button>
+    </div>
+
+   
+    <form id="register-form" class="hidden" action="conn.php" method="post">
+      <input type="hidden" name="action" value="register">
+      
+      <div class="form-group">
+        <label class="form-label">Full Name</label>
+        <input type="text" name="full_name" class="form-input" placeholder="Enter your name" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" name="email" class="form-input" placeholder="Email" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Student ID</label>
+        <input type="text" name="student_id" class="form-input" placeholder="Student Id" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Course</label>
+        <select name="course" class="form-select" required>
+          <option>BS Information Systems</option>
+          <option>ACT/Associate in Computer Technology</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Year Level</label>
+        <select name="year_section" class="form-select" required>
+          <option>1st Year</option>
+          <option>2nd Year</option>
+          <option>3rd Year</option>
+          <option>4th Year</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Section</label>
+        <input type="text" name="section" class="form-input" placeholder="Enter your section" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input type="password" name="password" class="form-input" placeholder="Min. 6 characters" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Confirm Password</label>
+        <input type="password" name="confirm_password" class="form-input" placeholder="Repeat your password" required>
+      </div>
+
+      <button type="submit" class="submit-btn">Create Account</button>
+
+      <p class="form-switch">Already have an account? <button type="button" class="switch-btn" id="show-login">Sign in</button></p>
+      
+    </form>
+
+    <form id="login-form" action="conn.php" method="post">
+      <input type="hidden" name="action" value="login">
+
+      <div class="form-group">
+        <label class="form-label" for="login-student-id">Student ID</label>
+        <input type="text" id="login-student-id" name="student_id" class="form-input" placeholder="Student Id" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="login-password">Password</label>
+        <input type="password" id="login-password" name="password" class="form-input" placeholder="Your password" required>
+      </div>
+
+      <button type="submit" class="submit-btn">Sign In</button>
+
+      <p class="form-switch">Need an account? <button type="button" class="switch-btn" id="show-register">Register</button></p>
+    </form>
+  </div>
+
+  <script>
+    const registerForm = document.getElementById('register-form');
+    const loginForm = document.getElementById('login-form');
+    const signInTab = document.getElementById('sign-in-tab');
+    const registerTab = document.getElementById('register-tab');
+    const showLoginButton = document.getElementById('show-login');
+    const showRegisterButton = document.getElementById('show-register');
+
+    const showLogin = () => {
+      registerForm.classList.add('hidden');
+      loginForm.classList.remove('hidden');
+      signInTab.classList.add('active');
+      registerTab.classList.remove('active');
+    };
+
+    const showRegister = () => {
+      loginForm.classList.add('hidden');
+      registerForm.classList.remove('hidden');
+      registerTab.classList.add('active');
+      signInTab.classList.remove('active');
+    };
+
+    signInTab.addEventListener('click', showLogin);
+    registerTab.addEventListener('click', showRegister);
+    showLoginButton.addEventListener('click', showLogin);
+    showRegisterButton.addEventListener('click', showRegister);
+
+    showLogin();
+
+    const message = new URLSearchParams(window.location.search).get('message');
+    if (message) {
+      document.getElementById('status-message').textContent = message;
+    }
+
+  
+  </script>
+
+</body>
+</html>

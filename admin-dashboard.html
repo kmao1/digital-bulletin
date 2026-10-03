@@ -1,0 +1,1873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | Campus Connect</title>
+  
+  <!-- Font Awesome Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #0b0707;
+      --panel: rgba(20, 11, 11, 0.94);
+      --accent: #ff3030;
+      --glow: rgba(255, 48, 48, 0.4);
+      --text: #ffffff;
+      --muted: #b2a0a0;
+      --border: rgba(255, 48, 48, 0.3);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Rajdhani', sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 28px;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(255, 48, 48, 0.12), transparent 50%),
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 100% 100%, 30px 30px, 30px 30px;
+    }
+
+    /* Main Container Frame */
+    .frame {
+      width: 100%;
+      max-width: 1400px;
+      min-height: calc(100vh - 56px);
+      margin: auto;
+      padding: 30px 26px 26px;
+      position: relative;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: radial-gradient(circle at 10% 20%, rgba(255, 48, 48, 0.15), rgba(11, 7, 7, 0.96) 70%);
+      box-shadow: 0 0 40px var(--glow), inset 0 0 15px rgba(255, 48, 48, 0.1);
+      opacity: 0;
+      transform: translateY(24px) scale(0.96);
+      animation: dashboardFramePop 0.75s cubic-bezier(0.17, 0.67, 0.32, 1.25) forwards;
+    }
+
+    .frame::before, .frame::after {
+      content: '';
+      position: absolute;
+      height: 2px;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+    }
+    .frame::before { top: 16px; left: 16px; width: 64px; }
+    .frame::after { right: 16px; bottom: 16px; width: 84px; }
+
+    @keyframes dashboardFramePop {
+      0% { opacity: 0; transform: translateY(24px) scale(0.96); }
+      70% { opacity: 1; transform: translateY(-3px) scale(1.01); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .frame > .topbar { opacity: 0; transform: translateY(-12px); animation: dashboardContentPop 0.55s ease 0.35s forwards; }
+    .frame > .hero { opacity: 0; transform: translateY(14px); animation: dashboardContentPop 0.55s ease 0.5s forwards; }
+    .frame > .layout { opacity: 0; transform: translateY(18px); animation: dashboardContentPop 0.65s ease 0.7s forwards; }
+
+    @keyframes dashboardContentPop {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Top Bar Header */
+    .topbar, .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+    .topbar { position: relative; z-index: 1; }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 12px;
+      color: var(--muted);
+      font: 700 0.85rem 'Orbitron';
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      border: 1px solid var(--border);
+      background: rgba(8, 7, 11, 0.7);
+      clip-path: polygon(0 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%);
+    }
+
+    .brand img {
+      display: block;
+      object-fit: cover;
+      background: #ffffff;
+    }
+
+    .brand-bcc {
+      width: 38px;
+      height: 38px;
+      padding: 2px;
+      border: 2px solid #72c743;
+      border-radius: 50%;
+    }
+
+    .brand-is {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 2px solid #f1d72e;
+      object-fit: cover;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .clock {
+      color: var(--muted);
+      font: 700 0.8rem 'Orbitron';
+      letter-spacing: 1px;
+    }
+
+    .icon-btn, .signout, .primary {
+      border: 1px solid var(--accent);
+      background: rgba(255, 48, 48, 0.08);
+      color: #ffffff;
+      cursor: pointer;
+      padding: 9px 14px;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .signout, .primary {
+      font: 700 0.68rem 'Orbitron';
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .icon-btn:hover, .signout:hover, .primary:hover {
+      box-shadow: 0 0 16px var(--glow);
+      background: rgba(255, 48, 48, 0.2);
+    }
+
+    /* Hero Banner */
+    .hero {
+      text-align: center;
+      margin: 28px 0 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero h1 {
+      font: 900 clamp(1.8rem, 4vw, 3.2rem)/1 'Orbitron';
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      text-shadow: 0 0 12px var(--glow);
+    }
+
+    .hero p {
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      margin-top: 10px;
+      font-weight: 700;
+    }
+
+    /* Dashboard Layout */
+    .layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 22px;
+      transition: grid-template-columns 0.3s ease;
+      position: relative;
+      z-index: 1;
+    }
+
+    .layout.collapsed {
+      grid-template-columns: 72px 1fr;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      position: relative;
+      box-shadow: inset 0 0 12px rgba(255, 48, 48, 0.08);
+      animation: panelPop 0.5s ease 0.9s both;
+    }
+
+    @keyframes panelPop {
+      from { opacity: 0; transform: translateY(12px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .panel::before {
+      content: '';
+      position: absolute;
+      left: -1px;
+      top: -1px;
+      width: 18px;
+      height: 18px;
+      border-left: 2px solid var(--accent);
+      border-top: 2px solid var(--accent);
+      border-radius: 12px 0 0;
+    }
+
+    /* Sidebar Navigation */
+    .profile {
+      display: flex;
+      gap: 11px;
+      align-items: center;
+      padding: 4px 2px 16px;
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .avatar {
+      min-width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--accent);
+      border-radius: 50%;
+      color: var(--accent);
+      font: 700 1rem 'Orbitron';
+      box-shadow: 0 0 10px var(--glow);
+    }
+
+    .profile-copy {
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .profile-copy strong { display: block; font-size: 0.95rem; }
+    .profile-copy small { color: var(--muted); font-size: 0.75rem; }
+
+    .nav {
+      display: grid;
+      gap: 9px;
+      margin-top: 18px;
+    }
+
+    .nav button {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      width: 100%;
+      padding: 12px;
+      color: var(--muted);
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      cursor: pointer;
+      text-align: left;
+      font: 700 0.7rem 'Orbitron';
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      white-space: nowrap;
+      overflow: hidden;
+      transition: all 0.2s ease;
+    }
+
+    .nav button i { width: 18px; text-align: center; }
+
+    .nav button:hover, .nav button.active {
+      color: #ffffff;
+      border-color: var(--border);
+      background: rgba(255, 48, 48, 0.12);
+    }
+
+    .nav button.active {
+      box-shadow: inset 3px 0 var(--accent);
+    }
+
+    .collapsed .profile { justify-content: center; padding-inline: 0; }
+    .collapsed .profile-copy, .collapsed .nav-label { opacity: 0; width: 0; pointer-events: none; }
+    .collapsed .nav button { justify-content: center; padding-inline: 7px; }
+
+    /* Views Framework */
+    .view { display: none; }
+    .view.active { display: block; animation: rise 0.25s ease; }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: none; }
+    }
+
+    h2, h3 {
+      font-family: 'Orbitron';
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    h2 { font-size: 1.05rem; }
+    h3 { font-size: 0.8rem; }
+
+    .muted, .section-head p {
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    /* Dashboard Stats Cards */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin: 18px 0 20px;
+    }
+
+    .stat {
+      padding: 16px;
+      border: 1px solid var(--border);
+      background: rgba(255, 48, 48, 0.06);
+      border-radius: 10px;
+    }
+
+    .stat i { color: var(--accent); float: right; font-size: 1.1rem; }
+    .stat small { color: var(--muted); text-transform: uppercase; letter-spacing: 1px; font-size: 0.7rem; }
+    .stat strong { display: block; font: 700 1.7rem 'Orbitron'; margin-top: 8px; }
+
+    /* Lists and Grids */
+    .grid-two { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; }
+    .list { display: grid; gap: 10px; margin-top: 16px; }
+
+    .list-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 13px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.02);
+      box-shadow: inset 0 0 12px rgba(255, 48, 48, 0.08);
+    }
+
+    .list-item strong { display: block; }
+    .tag { color: var(--accent); font-size: 0.68rem; text-transform: uppercase; white-space: nowrap; font-weight: 700; }
+
+    /* Form Design */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 18px; }
+    .field { display: grid; gap: 6px; }
+    .field.full { grid-column: 1 / -1; }
+    .field[hidden] { display: none; }
+    :root { --status-error: #ffb0b0; }
+    .toast.error, .board-status.error { color: var(--status-error); border-color: var(--status-error); }
+    button:disabled, select:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    label {
+      color: var(--muted);
+      font-size: 0.72rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 11px 12px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      color: #ffffff;
+      background: #0d0912;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 12px rgba(255, 48, 48, 0.18);
+    }
+
+    textarea { resize: vertical; }
+
+    .notice {
+      padding: 12px;
+      border-left: 2px solid var(--accent);
+      background: rgba(255, 48, 48, 0.08);
+      color: var(--muted);
+      font-size: 0.82rem;
+      border-radius: 0 6px 6px 0;
+    }
+
+    /* Calendar Component */
+    .calendar-controls { display: flex; align-items: center; gap: 8px; }
+    .calendar-controls button {
+      border: 1px solid var(--border);
+      background: rgba(255, 48, 48, 0.08);
+      color: #ffffff;
+      border-radius: 6px;
+      padding: 7px 10px;
+      cursor: pointer;
+    }
+
+    .calendar-layout { display: grid; grid-template-columns: 1.35fr 0.65fr; gap: 16px; margin-top: 18px; }
+    .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+
+    .calendar-weekday {
+      padding: 8px 4px;
+      text-align: center;
+      color: var(--accent);
+      font: 700 0.65rem 'Orbitron';
+      text-transform: uppercase;
+    }
+
+    .calendar-day {
+      min-height: 58px;
+      padding: 8px;
+      border: 1px solid rgba(255, 48, 48, 0.16);
+      border-radius: 7px;
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--muted);
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s ease;
+    }
+
+    .calendar-day:hover, .calendar-day.selected {
+      border-color: var(--accent);
+      background: rgba(255, 48, 48, 0.16);
+      color: #ffffff;
+    }
+
+    .calendar-day.empty {
+      border-color: transparent;
+      background: transparent;
+      cursor: default;
+    }
+
+    .calendar-day strong { display: block; color: inherit; }
+    .calendar-day.has-event strong { color: #ffffff; }
+
+    .event-dot {
+      display: block;
+      width: 6px;
+      height: 6px;
+      margin-top: 9px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--glow);
+    }
+
+    .calendar-event {
+      padding: 13px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.02);
+      margin-bottom: 10px;
+      position: relative;
+    }
+
+    .calendar-event strong { display: block; }
+    .calendar-event small { display: block; color: var(--muted); margin-top: 4px; }
+    .calendar-event .tag { display: inline-block; margin-top: 8px; }
+    .calendar-event button {
+      float: right;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      border-radius: 4px;
+      padding: 4px 7px;
+      cursor: pointer;
+    }
+
+    .calendar-form { margin-top: 16px; }
+
+    /* Messages & Users Component */
+    .message-layout { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 16px; }
+    .message-list { display: grid; gap: 10px; margin-top: 16px; }
+
+    .message-row {
+      padding: 13px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .message-row strong { display: block; margin-bottom: 4px; }
+    .message-row small { color: var(--muted); }
+
+    .user-filters { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 10px; margin: 18px 0; }
+    .user-list { display: grid; gap: 10px; }
+
+    .user-row {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr 1fr auto;
+      align-items: center;
+      gap: 12px;
+      padding: 13px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .user-row strong { display: block; }
+    .user-row small { color: var(--muted); }
+
+    .danger {
+      border: 1px solid rgba(255, 90, 90, 0.45);
+      background: rgba(255, 90, 90, 0.08);
+      color: #ffb0b0;
+      border-radius: 6px;
+      padding: 8px 10px;
+      cursor: pointer;
+      font: 700 0.65rem 'Orbitron';
+      text-transform: uppercase;
+      transition: all 0.2s ease;
+    }
+    .danger:hover { background: rgba(255, 90, 90, 0.2); }
+
+    .empty-users {
+      padding: 20px;
+      text-align: center;
+      color: var(--muted);
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+    }
+
+    .toast {
+      display: none;
+      padding: 10px;
+      margin-top: 10px;
+      color: #b9ffcf;
+      border: 1px solid rgba(80, 255, 140, 0.35);
+      background: rgba(80, 255, 140, 0.07);
+      border-radius: 6px;
+      font-size: 0.85rem;
+    }
+    .toast.show { display: block; }
+
+    /* Responsive Styles */
+    @media(max-width: 900px) {
+      body { padding: 12px; }
+      .frame { min-height: calc(100vh - 24px); padding: 26px 14px 18px; }
+      .layout, .layout.collapsed { grid-template-columns: 1fr; }
+      .sidebar { display: block; margin-bottom: 14px; }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .grid-two, .message-layout, .calendar-layout { grid-template-columns: 1fr; }
+      .user-filters { grid-template-columns: 1fr; }
+      .user-row { grid-template-columns: 1fr 1fr; }
+      .user-row .danger { grid-column: 1 / -1; }
+    }
+
+    @media(max-width: 600px) {
+      body { padding: 10px; }
+      .frame { min-height: calc(100vh - 20px); padding: 24px 12px 18px; }
+      .topbar { align-items: flex-start; flex-wrap: wrap; }
+      .top-actions { width: 100%; justify-content: flex-end; }
+      .hero { margin: 22px 0; }
+      .hero h1 { font-size: clamp(1.6rem, 9vw, 2.5rem); letter-spacing: 2px; }
+      .nav { grid-template-columns: repeat(2, minmax(0, 1fr)); display: grid; }
+      .layout.collapsed .profile-copy, .layout.collapsed .nav-label { opacity: 1; width: auto; pointer-events: auto; }
+      .layout.collapsed .profile, .layout.collapsed .nav button { justify-content: flex-start; padding: 10px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .user-row { grid-template-columns: 1fr; }
+      .calendar-day { min-height: 46px; padding: 6px; }
+      .clock { display: none; }
+    }
+
+    @media (max-width: 380px) {
+      .nav, .stats { grid-template-columns: 1fr; }
+    }
+
+    :root { --bg: #040208; --panel: rgba(12, 6, 20, 0.88); --accent: #a855f7; --glow: rgba(168, 85, 247, 0.3); --text: #f3e8ff; --muted: #a885c7; --border: rgba(168, 85, 247, 0.3); }
+    body { display: flex; justify-content: center; align-items: center; padding: 28px; overflow-x: hidden; position: relative; background-color: var(--bg); background-image: radial-gradient(circle at 50% 20%, rgba(168, 85, 247, 0.15), rgba(4, 2, 8, 0.95) 70%); }
+    body::before { content: 'CYBER LYNX'; position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%); color: rgba(255,255,255,.025); -webkit-text-stroke: 1px rgba(168,85,247,.12); font: 900 clamp(4rem, 12vw, 11rem) 'Orbitron', sans-serif; letter-spacing: 12px; white-space: nowrap; pointer-events: none; z-index: 0; }
+    .frame { width: 92%; max-width: 1280px; min-height: 700px; padding: 40px; border: 1px solid var(--border); border-radius: 16px; background: radial-gradient(circle at 50% 20%, rgba(168, 85, 247, 0.15), rgba(4, 2, 8, 0.95) 70%); box-shadow: 0 0 40px var(--glow), inset 0 0 15px rgba(168, 85, 247, 0.12); }
+    .frame > * { position: relative; z-index: 1; }
+    .panel { border: 1px solid var(--border); border-radius: 12px; box-shadow: inset 0 0 12px rgba(168, 85, 247, 0.08); }
+    .icon-btn, .signout { border-color: var(--border); background: rgba(168, 85, 247, 0.08); }
+    .icon-btn:hover, .signout:hover { background: rgba(168, 85, 247, 0.2); }
+    .brand { border-radius: 4px; clip-path: polygon(0 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%); }
+    .brand img.brand-bcc, .brand img.brand-is { width: 48px; height: 48px; border: 2px solid var(--accent); border-radius: 8px; object-fit: contain; background: rgba(0, 0, 0, 0.8); padding: 4px; box-shadow: 0 0 16px var(--glow); }
+    .brand small { display: block; color: var(--muted); font: 600 0.65rem 'Rajdhani', sans-serif; letter-spacing: 1px; text-transform: none; }
+    .hero { text-align: center; margin: 28px 0 24px; }
+    .hero h1 { font: 900 clamp(1.8rem, 4vw, 3.2rem)/1 'Orbitron', sans-serif; letter-spacing: 3px; text-transform: uppercase; text-shadow: 0 0 12px var(--glow); }
+    .hero p { color: var(--accent); letter-spacing: 3px; }
+    .nav button { border-radius: 4px; text-transform: uppercase; letter-spacing: 1px; font: 700 0.7rem 'Orbitron', sans-serif; }
+    .nav button:hover, .nav button.active { background: rgba(168, 85, 247, 0.16); }
+    .stat { border-color: var(--border); border-radius: 10px; background: rgba(168, 85, 247, 0.08); }
+    .stat strong { font: 700 1.7rem 'Orbitron', sans-serif; }
+    .list-item { border-radius: 8px; }
+    .list-item { box-shadow: inset 0 0 12px rgba(168, 85, 247, 0.08); }
+    input:focus, select:focus, textarea:focus { box-shadow: 0 0 12px rgba(168, 85, 247, 0.22); }
+    .notice { background: rgba(168, 85, 247, 0.08); }
+    .calendar-controls button { background: rgba(168, 85, 247, 0.08); }
+    .calendar-day { border-color: rgba(168, 85, 247, 0.18); }
+    .calendar-day:hover, .calendar-day.selected { background: rgba(168, 85, 247, 0.16); }
+    .primary { border: 1px solid var(--accent); border-radius: 8px; background: var(--accent); color: #fff; box-shadow: 0 0 12px var(--glow); }
+    .primary:hover { background: #c084fc; color: #fff; box-shadow: 0 0 20px var(--accent); }
+    .board-editor-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr); gap: 16px; margin-top: 18px; }
+    .board-preview { min-height: 240px; display: flex; flex-direction: column; justify-content: space-between; padding: 20px; border: 1px solid var(--border); border-radius: 12px; background: radial-gradient(circle at 50% 20%, rgba(168, 85, 247, 0.2), rgba(4, 2, 8, 0.95) 70%); }
+    .board-preview h3 { margin: 20px 0 10px; font: 700 1.5rem 'Rajdhani', sans-serif; text-transform: none; letter-spacing: 0; }
+    .board-preview p { color: var(--muted); line-height: 1.5; }
+    .slide-list { display: grid; gap: 9px; margin-top: 14px; }
+    .slide-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 10px; padding: 12px; border: 1px solid var(--border); border-radius: 6px; background: rgba(255, 255, 255, 0.025); }
+    .slide-row strong, .slide-row small { display: block; }
+    .slide-row small { color: var(--muted); margin-top: 3px; }
+    .slide-row button { border: 1px solid var(--border); border-radius: 5px; padding: 7px 9px; color: var(--text); background: transparent; cursor: pointer; }
+    .slide-row button:hover { border-color: var(--accent); }
+    .board-empty { padding: 18px; color: var(--muted); border: 1px dashed var(--border); border-radius: 6px; }
+    .board-status { color: #c084fc; min-height: 1.3em; margin-top: 10px; }
+    .board-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .secondary { border: 1px solid var(--border); background: transparent; color: var(--text); padding: 9px 12px; border-radius: 6px; cursor: pointer; }
+    .secondary:hover { border-color: var(--accent); }
+    @media (max-width: 900px) { .board-editor-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 768px) { body { align-items: flex-start; padding: 12px; } .frame { width: 100%; min-height: calc(100vh - 24px); padding: 24px; } }
+    @media (max-width: 600px) {
+      body { padding: 10px; }
+      .frame { min-height: calc(100vh - 20px); padding: 24px 12px 18px; }
+      .hero { text-align: center; }
+      .layout, .layout.collapsed { display: flex; flex-direction: column; gap: 12px; }
+      .sidebar { position: sticky; top: 0; z-index: 15; display: block; width: 100%; margin: 0; padding: 9px; background: rgba(12, 6, 20, .97); box-shadow: 0 8px 20px rgba(0, 0, 0, .35); }
+      .sidebar .profile { display: none; }
+      .nav, .layout.collapsed .nav { display: flex; flex-flow: row nowrap; gap: 7px; margin-top: 0; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: thin; }
+      .nav button, .layout.collapsed .nav button { flex: 0 0 auto; width: auto; justify-content: flex-start; gap: 7px; min-height: 42px; padding: 10px 12px; }
+      .layout.collapsed .nav-label { opacity: 1; width: auto; pointer-events: auto; }
+      .slide-row { grid-template-columns: minmax(0, 1fr) auto; }
+      .slide-row .slide-remove { grid-column: 2; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="frame">
+    
+    <!-- Top Header Navigation Bar -->
+    <header class="topbar">
+      <div class="brand" aria-label="Bacolod City College Information Systems">
+        <img class="brand-bcc" src="bcc.jpg" alt="Bacolod City College seal">
+        <img class="brand-is" src="IS.jpg" alt="Information Systems department shield">
+      </div>
+      <div class="top-actions">
+        <span class="clock" id="live-clock">--:--:-- PM</span>
+        <button class="icon-btn" title="Notifications"><i class="fa-solid fa-bell"></i></button>
+        <button class="signout" id="signout"><i class="fa-solid fa-right-from-bracket"></i> Sign out</button>
+      </div>
+    </header>
+
+    <!-- Admin Hero Title Header -->
+    <section class="hero">
+      <h1>Admin Control</h1>
+      <p>System Administration Portal</p>
+    </section>
+
+    <!-- Main Sidebar + Content Layout Grid -->
+    <div class="layout collapsed" id="layout">
+      
+      <!-- Collapsible Sidebar -->
+      <aside class="panel sidebar" id="sidebar">
+        <div class="profile">
+          <div class="avatar">A</div>
+          <div class="profile-copy">
+            <strong id="admin-name">Administrator</strong>
+            <small id="admin-email">Loading...</small>
+          </div>
+        </div>
+        <nav class="nav">
+          <button class="active" data-view="dashboard">
+            <i class="fa-solid fa-chart-line"></i>
+            <span class="nav-label">Dashboard</span>
+          </button>
+          <button data-view="schedules">
+            <i class="fa-solid fa-clock"></i>
+            <span class="nav-label">Schedules</span>
+          </button>
+          <button type="button" data-live-bulletin="true" onclick="window.location.href='bulletin.html'">
+            <i class="fa-solid fa-display"></i>
+            <span class="nav-label">Live Bulletin</span>
+          </button>
+          <button data-view="hallway-editor"><i class="fa-solid fa-sliders"></i><span class="nav-label">Hallway display</span></button>
+          <button data-view="calendar">
+            <i class="fa-solid fa-calendar-days"></i>
+            <span class="nav-label">Calendar</span>
+          </button>
+          <button data-view="messages">
+            <i class="fa-solid fa-comments"></i>
+            <span class="nav-label">Messages</span>
+          </button>
+          <button data-view="compose">
+            <i class="fa-solid fa-pen-to-square"></i>
+            <span class="nav-label">Compose</span>
+          </button>
+          <button data-view="manage-users">
+            <i class="fa-solid fa-users-gear"></i>
+            <span class="nav-label">Manage Users</span>
+          </button>
+        </nav>
+      </aside>
+
+      <!-- Main Dynamic Content Container -->
+      <main class="content">
+
+        <!-- Schedule Management View -->
+<section class="panel view" id="schedules">
+  <div class="section-head">
+    <div>
+      <h2>Manage Student Schedules</h2>
+      <p>Assign and update student course schedules in real time.</p>
+    </div>
+    <span class="tag">Admin Editor</span>
+  </div>
+
+  <div class="form-grid">
+    <div class="field full">
+      <label for="schedule-student-select">Select Student</label>
+      <select id="schedule-student-select">
+        <option value="">Choose a student...</option>
+      </select>
+    </div>
+  </div>
+
+  <form id="schedule-editor-form" style="margin-top: 18px;" hidden>
+    <div class="section-head" style="margin-bottom: 12px;">
+      <h3>Schedule Details for <span id="selected-student-name" style="color: var(--accent);">—</span></h3>
+      <button class="secondary" type="button" id="add-class-row"><i class="fa-solid fa-plus"></i> Add Class</button>
+    </div>
+
+    <table style="width:100%; border-collapse: collapse; margin-bottom: 18px;" id="schedule-table">
+      <thead>
+        <tr style="text-align:left; border-bottom: 1px solid var(--border); color: var(--muted); font-size: 0.75rem;">
+          <th style="padding: 8px;">Subject Code & Name</th>
+          <th style="padding: 8px;">Day(s)</th>
+          <th style="padding: 8px;">Time Slot</th>
+          <th style="padding: 8px;">Room</th>
+          <th style="padding: 8px; text-align:center;">Action</th>
+        </tr>
+      </thead>
+      <tbody id="schedule-rows">
+        <!-- Class rows dynamically populated -->
+      </tbody>
+    </table>
+
+    <div style="display:flex; justify-content: flex-end; gap: 10px;">
+      <button class="primary" type="submit"><i class="fa-solid fa-floppy-disk"></i> Save & Send Schedule</button>
+    </div>
+  </form>
+  <div class="toast" id="schedule-toast" role="status" aria-live="polite"></div>
+</section>
+        
+        <!-- View 1: Dashboard Overview -->
+        <section class="panel view active" id="dashboard">
+          <div class="section-head">
+            <div>
+              <h2>Dashboard Overview</h2>
+              <p>Monitor campus content and system activity.</p>
+            </div>
+          </div>
+          <div class="stats">
+            <div class="stat">
+              <i class="fa-solid fa-bullhorn"></i>
+              <small>Announcements</small>
+              <strong id="admin-announcement-count">—</strong>
+            </div>
+            <div class="stat">
+              <i class="fa-solid fa-calendar-days"></i>
+              <small>Upcoming events</small>
+              <strong id="admin-event-count">—</strong>
+            </div>
+            <div class="stat">
+              <i class="fa-solid fa-users"></i>
+              <small>Active users</small>
+              <strong id="admin-user-count">—</strong>
+            </div>
+            <div class="stat">
+              <i class="fa-solid fa-paper-plane"></i>
+              <small>Notifications sent</small>
+              <strong id="admin-delivery-count">LIVE</strong>
+            </div>
+          </div>
+
+          <div class="grid-two">
+            <div class="panel">
+              <div class="section-head">
+                <h3>Recent announcements</h3>
+                <span class="muted">Live feed</span>
+              </div>
+              <div class="list" id="admin-recent-announcements"><p class="muted">Loading live bulletin...</p></div>
+            </div>
+
+            <div class="panel">
+              <div class="section-head">
+                <h3>System status</h3>
+              </div>
+              <div class="list">
+                <div class="list-item">
+                  <span class="muted">Bulletin service</span>
+                  <span class="tag" id="admin-bulletin-status">Checking</span>
+                </div>
+                <div class="list-item">
+                  <span class="muted">Student portal</span>
+                  <span class="tag">Online</span>
+                </div>
+                <div class="list-item">
+                  <span class="muted">Hallway slides</span>
+                  <span class="tag" id="admin-active-slides">—</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel view" id="hallway-editor">
+          <div class="section-head">
+            <div>
+              <h2>Hallway Display</h2>
+              <p>Save a slide to publish it directly to the public hallway screen and all student portals.</p>
+            </div>
+            <span class="tag"><i class="fa-solid fa-circle" style="font-size:.5rem;color:#a855f7"></i> Shared live board</span>
+          </div>
+          <div class="board-editor-grid">
+            <div class="panel">
+              <div class="section-head">
+                <h3 id="slide-form-heading">Add a slide</h3>
+                <button class="secondary" type="button" id="slide-reset"><i class="fa-solid fa-plus"></i> New</button>
+              </div>
+              <form id="hallway-slide-form">
+                <input type="hidden" id="slide-id">
+                <div class="form-grid">
+                  <div class="field">
+                    <label for="slide-category">Category</label>
+                    <select id="slide-category" required>
+                      <option>URGENT</option><option>ACADEMIC</option><option>ATHLETICS</option><option>EVENTS</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="slide-icon">Display icon</label>
+                    <select id="slide-icon">
+                      <option value="fa-bullhorn">Announcement</option><option value="fa-graduation-cap">Academic</option>
+                      <option value="fa-calendar-days">Calendar</option><option value="fa-trophy">Award</option>
+                      <option value="fa-masks-theater">Event</option><option value="fa-triangle-exclamation">Alert</option>
+                      <option value="fa-film">Film</option><option value="fa-shirt">Department merchandise</option>
+                    </select>
+                  </div>
+                  <div class="field full">
+                    <label for="slide-title">Headline</label>
+                    <input id="slide-title" maxlength="180" required placeholder="A clear, concise headline">
+                  </div>
+                  <div class="field full">
+                    <label for="slide-description">Details</label>
+                    <textarea id="slide-description" rows="4" maxlength="2000" required placeholder="What should students know?"></textarea>
+                  </div>
+                  <div class="field">
+                    <label for="slide-location">Location</label>
+                    <input id="slide-location" maxlength="180" placeholder="Optional">
+                  </div>
+                  <div class="field">
+                    <label for="slide-deadline">Deadline or time</label>
+                    <input id="slide-deadline" maxlength="80" placeholder="Optional">
+                  </div>
+                  <div class="field full">
+                    <label for="slide-image">Background image path or URL</label>
+                    <input id="slide-image" maxlength="500" placeholder="Optional, e.g. main bg.jpg">
+                  </div>
+                  <div class="field full board-actions">
+                    <button class="primary" type="submit"><i class="fa-solid fa-floppy-disk"></i> <span id="slide-submit-label">Add and publish</span></button>
+                  </div>
+                </div>
+              </form>
+              <div class="board-status" id="hallway-save-status" role="status" aria-live="polite"></div>
+            </div>
+            <div>
+              <div class="board-preview" aria-live="polite">
+                <span class="tag" id="preview-category">URGENT</span>
+                <div><h3 id="preview-title">Your headline preview</h3><p id="preview-description">Your announcement details will appear here.</p></div>
+                <small id="preview-meta" class="muted">HALLWAY DISPLAY PREVIEW</small>
+              </div>
+              <div class="section-head" style="margin-top:20px"><h3>Published slides</h3><span class="muted" id="slide-total">0 slides</span></div>
+              <div class="slide-list" id="hallway-slide-list"><div class="board-empty">Loading hallway slides...</div></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- View 2: Calendar View -->
+        <section class="panel view" id="calendar">
+          <div class="section-head">
+            <div>
+              <h2>Calendar</h2>
+              <p>Upcoming events and academic timelines.</p>
+            </div>
+            <span class="tag">September 2026</span>
+          </div>
+
+          <div class="calendar-layout">
+            <!-- Calendar Grid Panel -->
+            <div class="panel">
+              <div class="calendar-grid" id="calendar-grid"></div>
+              
+              <!-- Event Form -->
+              <form class="calendar-form" id="calendar-form">
+                <div class="form-grid">
+                  <div class="field">
+                    <label for="event-title">Event or holiday</label>
+                    <input id="event-title" required placeholder="Enter title">
+                  </div>
+                  <div class="field">
+                    <label for="event-date">Date</label>
+                    <input id="event-date" type="date" required>
+                  </div>
+                  <div class="field">
+                    <label for="event-type">Type</label>
+                    <select id="event-type">
+                      <option>Event</option>
+                      <option>Holiday</option>
+                      <option>Meeting</option>
+                      <option>Deadline</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="event-audience">Audience</label>
+                    <input id="event-audience" placeholder="All departments">
+                  </div>
+                  <div class="field full">
+                    <button class="primary" type="submit">
+                      <i class="fa-solid fa-calendar-plus"></i>
+                      <span id="calendar-submit-label">Add to calendar</span>
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+
+            <!-- Event Details Sidebar Panel -->
+            <div class="panel">
+              <div class="section-head">
+                <h3>Upcoming events</h3>
+                <span class="muted">Next 30 days</span>
+              </div>
+              <div id="calendar-events"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- View 3: Private Messages Panel -->
+        <section class="panel view" id="messages">
+          <div class="section-head">
+            <div>
+              <h2>Messages</h2>
+              <p>Send a private message to one student. Students can receive messages but cannot reply.</p>
+            </div>
+            <span class="tag">Admin only</span>
+          </div>
+
+          <div class="message-layout">
+            <div class="panel">
+              <div class="section-head">
+                <h3>New private message</h3>
+                <span class="muted">One student only</span>
+              </div>
+              
+              <form id="message-form" action="conn.php" method="post">
+                <input type="hidden" name="action" value="admin_send_message">
+                
+                <div class="form-grid">
+                  <div class="field full">
+                    <label for="recipient-student">Student recipient</label>
+                    <select id="recipient-student" name="student_id" required>
+                      <option value="">Loading registered students...</option>
+                    </select>
+                  </div>
+                  
+                  <div class="field full">
+                    <div class="notice" id="recipient-summary">
+                      <i class="fa-solid fa-lock"></i> Select one student. Only that student will receive this message.
+                    </div>
+                  </div>
+                  
+                  <div class="field full">
+                    <label for="message-subject">Subject</label>
+                    <input id="message-subject" name="subject" required placeholder="Enter message subject">
+                  </div>
+                  
+                  <div class="field full">
+                    <label for="message-body">Message</label>
+                    <textarea id="message-body" name="message" rows="7" required placeholder="Write your message..."></textarea>
+                  </div>
+                  
+                  <div class="field full">
+                    <button class="primary" type="submit">
+                      <i class="fa-solid fa-paper-plane"></i> Send private message
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+
+            <div class="panel">
+              <div class="section-head">
+                <h3>Message policy</h3>
+                <span class="muted">Read-only delivery</span>
+              </div>
+              
+              <div class="notice">
+                <i class="fa-solid fa-shield-halved"></i> Messages are sent by the administrator to the selected student. There is no reply option.
+              </div>
+              
+              <div class="message-list" id="message-list">
+                <div class="message-row">
+                  <strong>Final exam reminder</strong>
+                  <small>Previous message · Student delivery</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- View 4: Compose Announcements -->
+        <section class="panel view" id="compose">
+          <div class="section-head">
+            <div>
+              <h2>Compose Announcement</h2>
+              <p>Publish a new message to the student portal.</p>
+            </div>
+          </div>
+
+          <form id="compose-form">
+            <div class="form-grid">
+              <div class="field full">
+                <label for="notice-title">Title</label>
+                <input id="notice-title" maxlength="180" required placeholder="Enter post title">
+              </div>
+              
+              <div class="field">
+                <label for="notice-category">Category</label>
+                <select id="notice-category">
+                  <option>General</option>
+                  <option>Urgent</option>
+                  <option>Academic</option>
+                </select>
+              </div>
+              
+              <div class="field">
+                <label for="notice-audience">Audience</label>
+                <select id="notice-audience" aria-describedby="notice-recipient-summary">
+                  <option value="all">All students</option>
+                  <option value="group">Filter by course, year, and section</option>
+                  <option value="student">Specific student</option>
+                </select>
+              </div>
+
+              <div class="field" data-notice-group hidden>
+                <label for="notice-course">Course</label>
+                <select id="notice-course" disabled aria-describedby="notice-recipient-summary"><option value="">All courses</option></select>
+              </div>
+              <div class="field" data-notice-group hidden>
+                <label for="notice-year">Year level</label>
+                <select id="notice-year" disabled aria-describedby="notice-recipient-summary"><option value="">All year levels</option></select>
+              </div>
+              <div class="field" data-notice-group hidden>
+                <label for="notice-section">Section</label>
+                <select id="notice-section" disabled aria-describedby="notice-recipient-summary"><option value="">All sections</option></select>
+              </div>
+              <div class="field full" id="notice-student-field" hidden>
+                <label for="notice-student">Student name</label>
+                <select id="notice-student" disabled aria-describedby="notice-recipient-summary"><option value="">Loading registered students...</option></select>
+              </div>
+              <div class="field full">
+                <div class="notice" id="notice-recipient-summary" role="status" aria-live="polite">All students will receive this announcement in their portals. Targeted notices are not shown on the public hallway screen.</div>
+              </div>
+              
+              <div class="field full">
+                <label for="notice-body">Content</label>
+                <textarea id="notice-body" rows="6" maxlength="5000" required placeholder="Write your message here..."></textarea>
+              </div>
+              
+              <div class="field full">
+                <button class="primary" type="submit">
+                  <i class="fa-solid fa-paper-plane"></i> Publish notice
+                </button>
+                <div class="toast" id="toast" role="status" aria-live="polite"></div>
+              </div>
+            </div>
+          </form>
+        </section>
+
+        <!-- View 5: User Management -->
+        <section class="panel view" id="manage-users">
+          <div class="section-head">
+            <div>
+              <h2>Manage Users</h2>
+              <p>Filter registered students and remove access when needed.</p>
+            </div>
+            <span class="tag" id="student-count">Loading...</span>
+          </div>
+
+          <div class="user-filters">
+            <input id="user-search" placeholder="Search by name or ID">
+            <select id="user-course-filter">
+              <option value="">All courses</option>
+            </select>
+            <select id="user-year-filter">
+              <option value="">All year levels</option>
+            </select>
+            <select id="user-section-filter">
+              <option value="">All sections</option>
+            </select>
+          </div>
+
+          <div class="user-list" id="user-list">
+            <div class="empty-users">Loading registered students...</div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="announcement-sync.js"></script>
+  <!-- Dashboard JavaScript Application Engine -->
+  <script>
+    // Sidebar Hover Expansion Behavior
+    const layout = document.getElementById('layout');
+    const sidebar = document.getElementById('sidebar');
+
+    const desktopHoverNavigation = window.matchMedia('(hover: hover) and (min-width: 901px)');
+    function updateAdminNavigationMode() {
+      layout.classList.toggle('collapsed', desktopHoverNavigation.matches);
+    }
+    updateAdminNavigationMode();
+    desktopHoverNavigation.addEventListener('change', updateAdminNavigationMode);
+    sidebar.addEventListener('mouseenter', () => {
+      if (desktopHoverNavigation.matches) layout.classList.remove('collapsed');
+    });
+    sidebar.addEventListener('mouseleave', () => {
+      if (desktopHoverNavigation.matches) layout.classList.add('collapsed');
+    });
+
+    // View Switching Navigation
+    const views = document.querySelectorAll('.view');
+    function openView(name) {
+      views.forEach(view => view.classList.toggle('active', view.id === name));
+      document.querySelectorAll('[data-view]').forEach(button => {
+        button.classList.toggle('active', button.dataset.view === name);
+      });
+    }
+
+    document.querySelectorAll('[data-view]').forEach(button => {
+      button.addEventListener('click', () => openView(button.dataset.view));
+    });
+
+    async function loadAdminProfile() {
+      try {
+        const response = await fetch('conn.php?action=admin_session', { credentials: 'same-origin' });
+        if (!response.ok) throw new Error('Administrator session expired');
+        const profile = await response.json();
+        document.getElementById('admin-name').textContent = profile.name || 'Administrator';
+        document.getElementById('admin-email').textContent = profile.email || '';
+      } catch (error) {
+        window.location.href = 'admin-login.html?message=' + encodeURIComponent('Please sign in to access the admin dashboard.');
+      }
+    }
+    loadAdminProfile();
+
+    const hallwayForm = document.getElementById('hallway-slide-form');
+    const hallwayList = document.getElementById('hallway-slide-list');
+    const hallwayStatus = document.getElementById('hallway-save-status');
+    let hallwaySlides = [];
+
+    function updateSlidePreview() {
+      const title = document.getElementById('slide-title').value.trim();
+      const description = document.getElementById('slide-description').value.trim();
+      const category = document.getElementById('slide-category').value;
+      const location = document.getElementById('slide-location').value.trim();
+      const deadline = document.getElementById('slide-deadline').value.trim();
+      document.getElementById('preview-category').textContent = category;
+      document.getElementById('preview-title').textContent = title || 'Your headline preview';
+      document.getElementById('preview-description').textContent = description || 'Your announcement details will appear here.';
+      document.getElementById('preview-meta').textContent = [location, deadline].filter(Boolean).join(' · ') || 'HALLWAY DISPLAY PREVIEW';
+    }
+
+    function renderHallwaySlides() {
+      hallwayList.innerHTML = '';
+      document.getElementById('slide-total').textContent = hallwaySlides.length + ' slide' + (hallwaySlides.length === 1 ? '' : 's');
+      document.getElementById('admin-active-slides').textContent = hallwaySlides.length + ' published';
+
+      if (!hallwaySlides.length) {
+        hallwayList.innerHTML = '<div class="board-empty">No slides published. Add a slide to begin.</div>';
+        return;
+      }
+
+      hallwaySlides.forEach((slide, index) => {
+        const row = document.createElement('div');
+        row.className = 'slide-row';
+        const copy = document.createElement('div');
+        const title = document.createElement('strong');
+        const detail = document.createElement('small');
+        title.textContent = slide.title;
+        detail.textContent = slide.category + (slide.location ? ' · ' + slide.location : '');
+        copy.append(title, detail);
+        const edit = document.createElement('button');
+        edit.type = 'button';
+        edit.dataset.action = 'edit';
+        edit.dataset.index = index;
+        edit.setAttribute('aria-label', 'Edit ' + slide.title);
+        edit.innerHTML = '<i class="fa-solid fa-pen"></i>';
+        const remove = document.createElement('button');
+        remove.type = 'button';
+        remove.className = 'slide-remove';
+        remove.dataset.action = 'remove';
+        remove.dataset.index = index;
+        remove.setAttribute('aria-label', 'Remove ' + slide.title);
+        remove.innerHTML = '<i class="fa-solid fa-trash"></i>';
+        row.append(copy, edit, remove);
+        hallwayList.appendChild(row);
+
+      });
+    }
+
+    async function loadAdminAnnouncements() {
+      const list = document.getElementById('admin-recent-announcements');
+      try {
+        const response = await fetch('conn.php?action=bulletin_announcements', { credentials: 'same-origin', cache: 'no-store' });
+        if (!response.ok) throw new Error('Unable to load announcements');
+        const data = await response.json();
+        const announcements = data.announcements || [];
+        document.getElementById('admin-announcement-count').textContent = announcements.length;
+        list.replaceChildren();
+        if (!announcements.length) {
+          list.innerHTML = '<p class="muted">No student announcements published.</p>';
+          return;
+        }
+        announcements.slice(0, 4).forEach(announcement => {
+          const row = document.createElement('div');
+          row.className = 'list-item';
+          const copy = document.createElement('div');
+          const title = document.createElement('strong');
+          const details = document.createElement('span');
+          details.className = 'muted';
+          title.textContent = announcement.title;
+          details.textContent = announcement.created_by + ' · ' + new Date(announcement.created_at).toLocaleDateString();
+          copy.append(title, details);
+          const tag = document.createElement('span');
+          tag.className = 'tag';
+          tag.textContent = announcement.category;
+          row.append(copy, tag);
+          list.appendChild(row);
+        });
+      } catch (error) {
+        list.innerHTML = '<p class="muted">Student announcements are unavailable.</p>';
+      }
+    }
+
+    function clearSlideForm() {
+      hallwayForm.reset();
+      document.getElementById('slide-id').value = '';
+      document.getElementById('slide-form-heading').textContent = 'Add a slide';
+      document.getElementById('slide-submit-label').textContent = 'Add and publish';
+      updateSlidePreview();
+    }
+
+    async function loadHallwaySlides() {
+      try {
+        const response = await fetch('conn.php?action=hallway_bulletin', { credentials: 'same-origin' });
+        if (!response.ok) throw new Error('Unable to load hallway slides');
+        const data = await response.json();
+        hallwaySlides = Array.isArray(data.config?.announcements) ? data.config.announcements : [];
+        document.getElementById('admin-bulletin-status').textContent = 'Online';
+        document.getElementById('admin-delivery-count').textContent = 'LIVE';
+        hallwayStatus.textContent = data.updatedAt ? 'Last published ' + new Date(data.updatedAt).toLocaleString() : 'Ready to publish';
+        renderHallwaySlides();
+      } catch (error) {
+        document.getElementById('admin-bulletin-status').textContent = 'Unavailable';
+        hallwayStatus.textContent = 'Could not load hallway content. Check the server connection.';
+        hallwayList.innerHTML = '<div class="board-empty">Hallway content is unavailable.</div>';
+      }
+    }
+
+    let hallwaySaving = false;
+    async function persistHallwaySlides(nextSlides) {
+      if (hallwaySaving) return false;
+      hallwaySaving = true;
+      const controls = [...hallwayForm.elements, document.getElementById('slide-reset'), ...hallwayList.querySelectorAll('button')];
+      controls.forEach(control => { control.disabled = true; });
+      hallwayStatus.classList.remove('error');
+      hallwayStatus.textContent = 'Publishing to hallway and student portal...';
+      try {
+        const response = await fetch('conn.php?action=admin_save_hallway_bulletin', {
+          method: 'POST', credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ announcements: nextSlides })
+        });
+        const result = await response.json();
+        if (!response.ok || !result.saved || !Array.isArray(result.announcements)) throw new Error(result.error || 'The hallway board could not be saved.');
+        hallwaySlides = result.announcements;
+        renderHallwaySlides();
+        AnnouncementSync.publish(['hallway', 'announcements']);
+        loadAdminAnnouncements();
+        hallwayStatus.textContent = 'Published to the hallway display and student portal.';
+        return true;
+      } catch (error) {
+        hallwayStatus.classList.add('error');
+        hallwayStatus.textContent = error.message + ' Your changes have not been published. Retry saving.';
+        return false;
+      } finally {
+        hallwaySaving = false;
+        controls.forEach(control => { control.disabled = false; });
+      }
+    }
+
+    hallwayForm.addEventListener('input', updateSlidePreview);
+    hallwayForm.addEventListener('submit', async event => {
+      event.preventDefault();
+      if (hallwaySaving) return;
+      const id = document.getElementById('slide-id').value;
+      const category = document.getElementById('slide-category').value;
+      const badgeIcons = { URGENT: 'fa-triangle-exclamation', ACADEMIC: 'fa-graduation-cap', ATHLETICS: 'fa-trophy', EVENTS: 'fa-calendar-days' };
+      const slide = {
+        id: id || (window.crypto?.randomUUID ? window.crypto.randomUUID() : 'slide-' + Date.now()),
+        category,
+        title: document.getElementById('slide-title').value.trim(),
+        description: document.getElementById('slide-description').value.trim(),
+        location: document.getElementById('slide-location').value.trim(),
+        deadline: document.getElementById('slide-deadline').value.trim(),
+        posted: 'JUST POSTED',
+        bgImage: document.getElementById('slide-image').value.trim(),
+        icon: document.getElementById('slide-icon').value,
+        badgeIcon: badgeIcons[category]
+      };
+      const exists = hallwaySlides.some(item => item.id === id);
+      const nextSlides = exists ? hallwaySlides.map(item => item.id === id ? slide : item) : [...hallwaySlides, slide];
+      if (await persistHallwaySlides(nextSlides)) clearSlideForm();
+    });
+
+    hallwayList.addEventListener('click', async event => {
+      const button = event.target.closest('button[data-action]');
+      if (!button || hallwaySaving) return;
+      const index = Number(button.dataset.index);
+      const slide = hallwaySlides[index];
+      if (!slide) return;
+      if (button.dataset.action === 'remove') {
+        if (!window.confirm('Remove this slide from the hallway display and student portal?')) return;
+        if (await persistHallwaySlides(hallwaySlides.filter((item, itemIndex) => itemIndex !== index))) {
+          if (document.getElementById('slide-id').value === slide.id) clearSlideForm();
+        }
+        return;
+      }
+      document.getElementById('slide-id').value = slide.id;
+      document.getElementById('slide-category').value = slide.category;
+      document.getElementById('slide-icon').value = slide.icon || 'fa-bullhorn';
+      document.getElementById('slide-title').value = slide.title;
+      document.getElementById('slide-description').value = slide.description;
+      document.getElementById('slide-location').value = slide.location || '';
+      document.getElementById('slide-deadline').value = slide.deadline || '';
+      document.getElementById('slide-image').value = slide.bgImage || '';
+      document.getElementById('slide-form-heading').textContent = 'Edit slide';
+      document.getElementById('slide-submit-label').textContent = 'Save and publish';
+      updateSlidePreview();
+    });
+
+    document.getElementById('slide-reset').addEventListener('click', clearSlideForm);
+
+    loadHallwaySlides();
+    loadAdminAnnouncements();
+
+    // Real-Time Live Clock Ticker
+    function updateClock() {
+      const clockElement = document.getElementById('live-clock');
+      if (clockElement) {
+        clockElement.textContent = new Date().toLocaleTimeString();
+      }
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    // Dynamic Calendar Engine
+    const calendarSection = document.getElementById('calendar');
+    const today = new Date();
+    let calendarMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    
+    let calendarEvents = JSON.parse(localStorage.getItem('bulletin-calendar-events') || 'null') || [
+      { id: 1, title: 'Faculty coordination meeting', date: new Date(today.getFullYear(), today.getMonth(), 10).toISOString().slice(0, 10), type: 'Meeting', audience: 'All departments' },
+      { id: 2, title: 'Student portal review', date: new Date(today.getFullYear(), today.getMonth(), 11).toISOString().slice(0, 10), type: 'System', audience: 'Administration' },
+      { id: 3, title: 'Capstone defense', date: new Date(today.getFullYear(), today.getMonth(), 18).toISOString().slice(0, 10), type: 'Academic', audience: 'BS Information Systems' },
+      { id: 4, title: 'Scholarship deadline', date: new Date(today.getFullYear(), today.getMonth(), 23).toISOString().slice(0, 10), type: 'Deadline', audience: 'Student services' }
+    ];
+    let editingEventId = null;
+
+    function saveCalendarEvents() {
+      localStorage.setItem('bulletin-calendar-events', JSON.stringify(calendarEvents));
+    }
+
+    function dateKey(year, month, day) {
+      return year + '-' + String(month + 1).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+    }
+
+    function formatDate(value) {
+      return new Date(value + 'T00:00:00').toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' });
+    }
+
+    function renderCalendar() {
+      const year = calendarMonth.getFullYear();
+      const month = calendarMonth.getMonth();
+      const monthName = calendarMonth.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+
+      calendarSection.querySelector('.section-head').innerHTML = `
+        <div>
+          <h2>Calendar</h2>
+          <p>Upcoming events and academic timelines.</p>
+        </div>
+        <div class="calendar-controls">
+          <button type="button" id="previous-month" aria-label="Previous month"><i class="fa-solid fa-chevron-left"></i></button>
+          <span class="tag" id="calendar-month-label">${monthName}</span>
+          <button type="button" id="next-month" aria-label="Next month"><i class="fa-solid fa-chevron-right"></i></button>
+        </div>`;
+
+      const grid = document.getElementById('calendar-grid');
+      grid.innerHTML = '';
+
+      ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(day => {
+        const label = document.createElement('span');
+        label.className = 'calendar-weekday';
+        label.textContent = day;
+        grid.appendChild(label);
+      });
+
+      const firstDay = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+      for (let i = 0; i < firstDay; i++) {
+        const blank = document.createElement('span');
+        blank.className = 'calendar-day empty';
+        grid.appendChild(blank);
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const key = dateKey(year, month, day);
+        const events = calendarEvents.filter(event => event.date === key);
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'calendar-day' + (events.length ? ' has-event' : '');
+        button.innerHTML = `<strong>${day}</strong>${events.length ? '<span class="event-dot"></span>' : ''}`;
+        
+        button.addEventListener('click', () => {
+          document.querySelectorAll('.calendar-day').forEach(item => item.classList.remove('selected'));
+          button.classList.add('selected');
+          if (events[0]) focusCalendarEvent(events[0].id);
+        });
+        grid.appendChild(button);
+      }
+
+      const eventList = document.getElementById('calendar-events');
+      eventList.innerHTML = '';
+      
+      const monthEvents = calendarEvents.filter(event => {
+        const eventDate = new Date(event.date + 'T00:00:00');
+        return eventDate >= new Date(year, month, 1) && eventDate <= new Date(year, month + 1, 0);
+      }).sort((a, b) => a.date.localeCompare(b.date));
+      document.getElementById('admin-event-count').textContent = monthEvents.length;
+
+      if (!monthEvents.length) {
+        eventList.innerHTML = '<p class="muted">No events scheduled for this month.</p>';
+      } else {
+        monthEvents.forEach(event => {
+          const item = document.createElement('div');
+          item.className = 'calendar-event';
+          item.dataset.eventId = event.id;
+          item.innerHTML = `
+            <button type="button" title="Edit event"><i class="fa-solid fa-pen"></i></button>
+            <strong>${event.title}</strong>
+            <small>${formatDate(event.date)} · ${event.audience}</small>
+            <span class="tag">${event.type}</span>
+          `;
+          item.querySelector('button').addEventListener('click', () => editCalendarEvent(event.id));
+          eventList.appendChild(item);
+        });
+      }
+
+      document.getElementById('previous-month').addEventListener('click', () => {
+        calendarMonth = new Date(year, month - 1, 1);
+        renderCalendar();
+      });
+
+      document.getElementById('next-month').addEventListener('click', () => {
+        calendarMonth = new Date(year, month + 1, 1);
+        renderCalendar();
+      });
+    }
+
+    function focusCalendarEvent(id) {
+      const item = document.querySelector(`[data-event-id="${id}"]`);
+      if (item) {
+        document.querySelectorAll('.calendar-event').forEach(evt => evt.style.boxShadow = 'none');
+        item.style.boxShadow = '0 0 16px var(--glow)';
+        item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+
+    function editCalendarEvent(id) {
+      editingEventId = id;
+      const event = calendarEvents.find(item => item.id === id);
+      if (event) {
+        calendarMonth = new Date(event.date + 'T00:00:00');
+        renderCalendar();
+        document.getElementById('event-title').value = event.title;
+        document.getElementById('event-date').value = event.date;
+        document.getElementById('event-type').value = event.type;
+        document.getElementById('event-audience').value = event.audience;
+        document.getElementById('calendar-submit-label').textContent = 'Save changes';
+        document.getElementById('event-title').focus();
+      }
+    }
+
+    document.getElementById('calendar-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const title = document.getElementById('event-title').value.trim();
+      const date = document.getElementById('event-date').value;
+      const type = document.getElementById('event-type').value;
+      const audience = document.getElementById('event-audience').value.trim() || 'All departments';
+
+      if (editingEventId) {
+        const item = calendarEvents.find(entry => entry.id === editingEventId);
+        Object.assign(item, { title, date, type, audience });
+      } else {
+        calendarEvents.push({ id: Date.now(), title, date, type, audience });
+      }
+
+      saveCalendarEvents();
+      editingEventId = null;
+      calendarMonth = new Date(date + 'T00:00:00');
+      renderCalendar();
+    });
+
+    renderCalendar();
+
+    const noticeAudience = document.getElementById('notice-audience');
+    const noticeCourse = document.getElementById('notice-course');
+    const noticeYear = document.getElementById('notice-year');
+    const noticeSection = document.getElementById('notice-section');
+    const noticeStudent = document.getElementById('notice-student');
+    const noticeRecipientSummary = document.getElementById('notice-recipient-summary');
+    let studentRosterReady = false;
+
+    function getNoticeFilters() {
+      return Object.fromEntries(Object.entries({ course: noticeCourse.value, year: noticeYear.value, section: noticeSection.value }).filter(([, value]) => value));
+    }
+
+    function getNoticeRecipients() {
+      const filters = getNoticeFilters();
+      return registeredStudents.filter(student =>
+        (!filters.course || student.course === filters.course) &&
+        (!filters.year || student.year_section === filters.year) &&
+        (!filters.section || student.section === filters.section)
+      );
+    }
+
+    function updateNoticeAudience() {
+      const mode = noticeAudience.value;
+      document.querySelectorAll('[data-notice-group]').forEach(field => {
+        field.hidden = mode !== 'group';
+        field.querySelector('select').disabled = mode !== 'group' || !studentRosterReady;
+      });
+      document.getElementById('notice-student-field').hidden = mode !== 'student';
+      noticeStudent.disabled = mode !== 'student' || !studentRosterReady;
+      noticeStudent.required = mode === 'student';
+      if (mode === 'all') {
+        noticeRecipientSummary.textContent = 'All students will receive this announcement in their portals. Targeted notices are not shown on the public hallway screen.';
+      } else if (!studentRosterReady) {
+        noticeRecipientSummary.textContent = 'Student recipients are unavailable. Reload the page to retry loading the student list.';
+      } else if (mode === 'student') {
+        const student = registeredStudents.find(item => String(item.id) === noticeStudent.value);
+        noticeRecipientSummary.textContent = student
+          ? 'Only ' + student.full_name + ' (' + student.student_id + ') will receive this notice. ' + [student.course, student.year_section, student.section].filter(Boolean).join(' · ')
+          : 'Choose one registered student. This notice will appear only in that student’s portal.';
+      } else if (!Object.keys(getNoticeFilters()).length) {
+        noticeRecipientSummary.textContent = 'Select at least one course, year, or section. Students must match every selected filter.';
+      } else {
+        const count = getNoticeRecipients().length;
+        noticeRecipientSummary.textContent = count ? count + ' student' + (count === 1 ? '' : 's') + ' match every selected filter. Only their portals will show this notice.' : 'No students match these filters. Change the course, year, or section before publishing.';
+      }
+    }
+
+    function fillNoticeAudienceOptions() {
+      [[noticeCourse, 'course'], [noticeYear, 'year_section'], [noticeSection, 'section']].forEach(([select, key]) => {
+        const previous = select.value;
+        select.length = 1;
+        addFilterOptions(select, [...new Set(registeredStudents.map(student => student[key]))].filter(Boolean).sort());
+        select.value = previous;
+        if (select.selectedIndex < 0) select.selectedIndex = 0;
+      });
+      const previousStudent = noticeStudent.value;
+      noticeStudent.replaceChildren(new Option(registeredStudents.length ? 'Choose a student' : 'No registered students', ''));
+      registeredStudents.forEach(student => {
+        noticeStudent.add(new Option(student.full_name + ' · ' + student.student_id, String(student.id)));
+      });
+      noticeStudent.value = previousStudent;
+      if (noticeStudent.selectedIndex < 0) noticeStudent.selectedIndex = 0;
+      updateNoticeAudience();
+    }
+
+    [noticeAudience, noticeCourse, noticeYear, noticeSection, noticeStudent].forEach(field => field.addEventListener('change', updateNoticeAudience));
+
+    // Preserve recipient/content selections on failure and prevent duplicate posts.
+    document.getElementById('compose-form').addEventListener('submit', async event => {
+      event.preventDefault();
+      const form = event.target;
+      const submit = form.querySelector('button[type="submit"]');
+      if (submit.disabled) return;
+      const toast = document.getElementById('toast');
+      const audienceType = noticeAudience.value;
+      const audienceValue = audienceType === 'student' ? noticeStudent.value : '';
+      const audienceFilters = audienceType === 'group' ? getNoticeFilters() : {};
+      toast.classList.add('show');
+      toast.classList.remove('error');
+      try {
+        if (audienceType !== 'all' && !studentRosterReady) throw new Error('Wait for the student list to load, or reload the page to retry.');
+        if (audienceType === 'student' && !registeredStudents.some(student => String(student.id) === audienceValue)) throw new Error('Choose a registered student before publishing.');
+        if (audienceType === 'group' && !Object.keys(audienceFilters).length) throw new Error('Select at least one course, year, or section filter.');
+        if (audienceType === 'group' && !getNoticeRecipients().length) throw new Error('No students match these filters. Choose a different audience.');
+        submit.disabled = true;
+        toast.textContent = 'Publishing announcement...';
+        const response = await fetch('conn.php?action=publish_announcement', {
+          method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title: document.getElementById('notice-title').value.trim(),
+            category: document.getElementById('notice-category').value,
+            audienceType, audienceValue, audienceFilters,
+            message: document.getElementById('notice-body').value.trim()
+          })
+        });
+        const result = await response.json();
+        if (!response.ok || !result.published) throw new Error(result.error || 'The notice could not be published.');
+        toast.textContent = 'Notice published to the selected student portal audience.';
+        AnnouncementSync.publish(['announcements']);
+        form.reset();
+        updateNoticeAudience();
+        loadAdminAnnouncements();
+      } catch (error) {
+        toast.textContent = error.message;
+        toast.classList.add('error');
+      } finally {
+        submit.disabled = false;
+      }
+    });
+
+    // Student & User Management Engine
+    const recipientStudent = document.getElementById('recipient-student');
+    const recipientSummary = document.getElementById('recipient-summary');
+    const userList = document.getElementById('user-list');
+    const userSearch = document.getElementById('user-search');
+    const courseFilter = document.getElementById('user-course-filter');
+    const yearFilter = document.getElementById('user-year-filter');
+    const sectionFilter = document.getElementById('user-section-filter');
+    
+    let registeredStudents = [];
+
+    async function loadStudents() {
+      try {
+        const response = await fetch('conn.php?action=admin_students', { credentials: 'same-origin' });
+        if (!response.ok) throw new Error('Unable to load students');
+        
+        const data = await response.json();
+        registeredStudents = data.students || [];
+        studentRosterReady = true;
+        fillNoticeAudienceOptions();
+        document.getElementById('admin-user-count').textContent = registeredStudents.length;
+        
+        recipientStudent.innerHTML = '<option value="">Choose a student</option>';
+        registeredStudents.forEach(student => {
+          const option = document.createElement('option');
+          option.value = student.id;
+          option.textContent = student.full_name + ' · ' + student.student_id;
+          option.dataset.details = student.course + ' · ' + student.year_section + ' · Section ' + (student.section || '');
+          recipientStudent.appendChild(option);
+        });
+
+        fillFilterOptions();
+        renderStudents();
+      } catch (error) {
+        studentRosterReady = false;
+        noticeStudent.replaceChildren(new Option('Student list unavailable', ''));
+        updateNoticeAudience();
+        recipientStudent.innerHTML = '<option value="">Student list unavailable</option>';
+        userList.innerHTML = '<div class="empty-users">Student list unavailable.</div>';
+      }
+    }
+
+    function addFilterOptions(select, values) {
+      values.forEach(value => {
+        const option = document.createElement('option');
+        option.value = value;
+        option.textContent = value;
+        select.appendChild(option);
+      });
+    }
+
+    function fillFilterOptions() {
+      courseFilter.length = 1;
+      yearFilter.length = 1;
+      sectionFilter.length = 1;
+      addFilterOptions(courseFilter, [...new Set(registeredStudents.map(s => s.course))].filter(Boolean));
+      addFilterOptions(yearFilter, [...new Set(registeredStudents.map(s => s.year_section))].filter(Boolean));
+      addFilterOptions(sectionFilter, [...new Set(registeredStudents.map(s => s.section))].filter(Boolean));
+    }
+
+    function renderStudents() {
+      const query = userSearch.value.trim().toLowerCase();
+      const filtered = registeredStudents.filter(student => 
+        (student.full_name.toLowerCase().includes(query) || student.student_id.toLowerCase().includes(query)) &&
+        (!courseFilter.value || student.course === courseFilter.value) &&
+        (!yearFilter.value || student.year_section === yearFilter.value) &&
+        (!sectionFilter.value || student.section === sectionFilter.value)
+      );
+
+      document.getElementById('student-count').textContent = filtered.length + ' student' + (filtered.length === 1 ? '' : 's');
+      userList.innerHTML = '';
+
+      if (!filtered.length) {
+        userList.innerHTML = '<div class="empty-users">No students match these filters.</div>';
+        return;
+      }
+
+      filtered.forEach(student => {
+        const row = document.createElement('div');
+        row.className = 'user-row';
+        row.innerHTML = `
+          <div>
+            <strong>${student.full_name}</strong>
+            <small>${student.email}</small>
+          </div>
+          <span>${student.course}</span>
+          <span>${student.year_section}</span>
+          <span>Section ${student.section || 'Not set'}</span>
+          <button class="danger" type="button">Remove</button>
+        `;
+        row.querySelector('.danger').addEventListener('click', () => removeStudent(student));
+        userList.appendChild(row);
+      });
+    }
+
+    function removeStudent(student) {
+      if (!window.confirm('Remove ' + student.full_name + ' from student accounts?')) return;
+      const form = new FormData();
+      form.append('action', 'admin_delete_student');
+      form.append('student_id', student.id);
+
+      fetch('conn.php', { method: 'POST', body: form, credentials: 'same-origin' }).then(() => {
+        registeredStudents = registeredStudents.filter(item => item.id !== student.id);
+        fillNoticeAudienceOptions();
+        renderStudents();
+        const option = recipientStudent.querySelector(`option[value="${student.id}"]`);
+        if (option) option.remove();
+      });
+    }
+
+    recipientStudent.addEventListener('change', () => {
+      const option = recipientStudent.options[recipientStudent.selectedIndex];
+      if (option && option.value) {
+        recipientSummary.innerHTML = `<i class="fa-solid fa-lock"></i> Send message only to <strong>${option.textContent}</strong> (${option.dataset.details}).`;
+      } else {
+        recipientSummary.innerHTML = `<i class="fa-solid fa-lock"></i> Select one student. Only that student will receive this message.`;
+      }
+    });
+
+    [userSearch, courseFilter, yearFilter, sectionFilter].forEach(field => field.addEventListener('input', renderStudents));
+
+    loadStudents();
+
+    // Sign out Handler
+    document.getElementById('signout').addEventListener('click', () => {
+      window.location.href = 'conn.php?action=logout';
+    });
+
+    // Schedule Editor Logic
+const scheduleStudentSelect = document.getElementById('schedule-student-select');
+const scheduleEditorForm = document.getElementById('schedule-editor-form');
+const scheduleRows = document.getElementById('schedule-rows');
+const selectedStudentName = document.getElementById('selected-student-name');
+const scheduleToast = document.getElementById('schedule-toast');
+
+// Populate student select menu for schedule view
+function updateScheduleStudentDropdown() {
+  scheduleStudentSelect.length = 1;
+  registeredStudents.forEach(student => {
+    scheduleStudentSelect.add(new Option(`${student.full_name} (${student.student_id})`, student.id));
+  });
+}
+
+// Intercept existing loadStudents callback to build dropdown
+const originalLoadStudents = loadStudents;
+loadStudents = async function() {
+  await originalLoadStudents();
+  updateScheduleStudentDropdown();
+};
+
+scheduleStudentSelect.addEventListener('change', () => {
+  const studentId = scheduleStudentSelect.value;
+  if (!studentId) {
+    scheduleEditorForm.hidden = true;
+    return;
+  }
+  const student = registeredStudents.find(s => String(s.id) === String(studentId));
+  selectedStudentName.textContent = student ? student.full_name : '';
+  scheduleEditorForm.hidden = false;
+  
+  // Load student's schedule from storage or initialize defaults
+  const savedSchedules = JSON.parse(localStorage.getItem('student_schedules') || '{}');
+  const studentSchedule = savedSchedules[studentId] || [
+    { code: 'IS 101 - Intro to Computing', days: 'Mon / Wed', time: '08:00 AM - 10:00 AM', room: 'Lab 1' }
+  ];
+  
+  renderScheduleRows(studentSchedule);
+});
+
+function renderScheduleRows(classes) {
+  scheduleRows.innerHTML = '';
+  classes.forEach(item => addClassRow(item.code, item.days, item.time, item.room));
+}
+
+function addClassRow(code = '', days = '', time = '', room = '') {
+  const tr = document.createElement('tr');
+  tr.style.borderBottom = '1px solid rgba(255,255,255,0.05)';
+  tr.innerHTML = `
+    <td style="padding: 6px;"><input type="text" class="class-code" value="${code}" placeholder="e.g. CC 102" required style="width:100%;"></td>
+    <td style="padding: 6px;"><input type="text" class="class-days" value="${days}" placeholder="e.g. Tue / Thu" required style="width:100%;"></td>
+    <td style="padding: 6px;"><input type="text" class="class-time" value="${time}" placeholder="e.g. 10:00 AM - 12:00 PM" required style="width:100%;"></td>
+    <td style="padding: 6px;"><input type="text" class="class-room" value="${room}" placeholder="e.g. Rm 302" required style="width:100%;"></td>
+    <td style="padding: 6px; text-align:center;">
+      <button type="button" class="danger" onclick="this.closest('tr').remove()"><i class="fa-solid fa-trash"></i></button>
+    </td>
+  `;
+  scheduleRows.appendChild(tr);
+}
+
+document.getElementById('add-class-row').addEventListener('click', () => addClassRow());
+
+scheduleEditorForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const studentId = scheduleStudentSelect.value;
+  if (!studentId) return;
+
+  const rows = scheduleRows.querySelectorAll('tr');
+  const updatedClasses = Array.from(rows).map(row => ({
+    code: row.querySelector('.class-code').value.trim(),
+    days: row.querySelector('.class-days').value.trim(),
+    time: row.querySelector('.class-time').value.trim(),
+    room: row.querySelector('.class-room').value.trim()
+  }));
+
+  const savedSchedules = JSON.parse(localStorage.getItem('student_schedules') || '{}');
+  savedSchedules[studentId] = updatedClasses;
+  localStorage.setItem('student_schedules', JSON.stringify(savedSchedules));
+
+  // Trigger sync broadcast across windows/tabs
+  if (window.AnnouncementSync) {
+    AnnouncementSync.publish(['schedules']);
+  }
+
+  scheduleToast.classList.add('show');
+  scheduleToast.textContent = 'Schedule updated and sent to student dashboard!';
+  setTimeout(() => scheduleToast.classList.remove('show'), 3000);
+});
+  </script>
+</body>
+</html>

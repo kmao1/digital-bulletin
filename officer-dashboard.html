@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Officer Dashboard</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap');
+
+    :root {
+      --bg: #0b0707;
+      --panel: rgba(20, 11, 11, 0.94);
+      --accent: #ff3030;
+      --glow: rgba(255, 48, 48, 0.4);
+      --text: #ffffff;
+      --muted: #b2a0a0;
+      --border: rgba(255, 48, 48, 0.3);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Rajdhani', sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 28px;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(255, 48, 48, 0.12), transparent 50%),
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 100% 100%, 30px 30px, 30px 30px;
+    }
+
+    /* Main Container Frame */
+    .frame {
+      width: 100%;
+      max-width: 1400px;
+      min-height: calc(100vh - 56px);
+      margin: auto;
+      padding: 30px 26px 26px;
+      position: relative;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: radial-gradient(circle at 10% 20%, rgba(255, 48, 48, 0.15), rgba(11, 7, 7, 0.96) 70%);
+      box-shadow: 0 0 40px var(--glow), inset 0 0 15px rgba(255, 48, 48, 0.08);
+      opacity: 0;
+      transform: translateY(24px) scale(0.96);
+      animation: dashboardFramePop 0.75s cubic-bezier(0.17, 0.67, 0.32, 1.25) forwards;
+    }
+
+    .frame::before,
+    .frame::after {
+      content: '';
+      position: absolute;
+      height: 2px;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+    }
+
+    .frame::before {
+      top: 16px;
+      left: 16px;
+      width: 64px;
+    }
+
+    .frame::after {
+      right: 16px;
+      bottom: 16px;
+      width: 84px;
+    }
+
+    /* Entry Animations */
+    @keyframes dashboardFramePop {
+      0% { opacity: 0; transform: translateY(24px) scale(0.96); }
+      70% { opacity: 1; transform: translateY(-3px) scale(1.01); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .frame > .topbar {
+      opacity: 0;
+      transform: translateY(-12px);
+      animation: dashboardContentPop 0.55s ease 0.35s forwards;
+    }
+
+    .frame > .hero {
+      opacity: 0;
+      transform: translateY(14px);
+      animation: dashboardContentPop 0.55s ease 0.5s forwards;
+    }
+
+    .frame > .layout {
+      opacity: 0;
+      transform: translateY(18px);
+      animation: dashboardContentPop 0.65s ease 0.7s forwards;
+    }
+
+    @keyframes dashboardContentPop {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .panel {
+      animation: panelPop 0.5s ease 0.9s both;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      position: relative;
+      box-shadow: inset 0 0 12px rgba(255, 48, 48, 0.08);
+    }
+
+    @keyframes panelPop {
+      from { opacity: 0; transform: translateY(12px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .panel::before {
+      content: '';
+      position: absolute;
+      left: -1px;
+      top: -1px;
+      width: 18px;
+      height: 18px;
+      border-left: 2px solid var(--accent);
+      border-top: 2px solid var(--accent);
+      border-radius: 12px 0 0 0;
+    }
+
+    /* Top Bar & Brand Header */
+    .topbar,
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .topbar {
+      position: relative;
+      z-index: 1;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 4px 10px 4px 4px;
+      color: var(--muted);
+      font: 700 0.85rem 'Orbitron', sans-serif;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      border: 1px solid rgba(255, 48, 48, 0.45);
+      background: rgba(8, 7, 11, 0.7);
+      clip-path: polygon(0 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%);
+    }
+
+    .brand-is {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    /* Buttons & Interactive Elements */
+    .icon-btn,
+    .signout,
+    .primary {
+      border: 1px solid var(--accent);
+      background: rgba(255, 48, 48, 0.08);
+      color: #fff;
+      cursor: pointer;
+      padding: 9px 12px;
+      border-radius: 6px;
+      transition: box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .signout,
+    .primary {
+      font: 700 0.68rem 'Orbitron', sans-serif;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .primary {
+      background: var(--accent);
+    }
+
+    .icon-btn:hover,
+    .signout:hover,
+    .primary:hover {
+      box-shadow: 0 0 16px var(--glow);
+    }
+
+    /* Hero Banner */
+    .hero {
+      text-align: center;
+      margin: 28px 0 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero h1 {
+      font: 900 clamp(1.8rem, 4vw, 3.2rem) / 1 'Orbitron', sans-serif;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    .hero p {
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      margin-top: 10px;
+      font-weight: 700;
+    }
+
+    /* Dashboard Grid Layout */
+    .layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 22px;
+      transition: grid-template-columns 0.3s ease;
+      position: relative;
+      z-index: 1;
+    }
+
+    .layout.collapsed {
+      grid-template-columns: 72px 1fr;
+    }
+
+    /* Sidebar Navigation */
+    .profile {
+      display: flex;
+      gap: 11px;
+      align-items: center;
+      padding: 4px 2px 16px;
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .avatar {
+      min-width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--accent);
+      border-radius: 50%;
+      color: var(--accent);
+      font: 700 1rem 'Orbitron', sans-serif;
+    }
+
+    .profile-copy {
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .profile-copy strong {
+      display: block;
+    }
+
+    .profile-copy small {
+      color: var(--muted);
+    }
+
+    .nav {
+      display: grid;
+      gap: 9px;
+      margin-top: 18px;
+    }
+
+    .nav button {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      width: 100%;
+      padding: 12px;
+      color: var(--muted);
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      cursor: pointer;
+      text-align: left;
+      font: 700 0.7rem 'Orbitron', sans-serif;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      white-space: nowrap;
+      overflow: hidden;
+      transition: all 0.2s ease;
+    }
+
+    .nav button i {
+      width: 18px;
+      text-align: center;
+    }
+
+    .nav button:hover,
+    .nav button.active {
+      color: #fff;
+      border-color: var(--border);
+      background: rgba(255, 48, 48, 0.12);
+    }
+
+    .nav button.active {
+      box-shadow: inset 3px 0 var(--accent);
+    }
+
+    .collapsed .profile {
+      justify-content: center;
+      padding-inline: 0;
+    }
+
+    .collapsed .profile-copy,
+    .collapsed .nav-label {
+      opacity: 0;
+      width: 0;
+      pointer-events: none;
+    }
+
+    .collapsed .nav button {
+      justify-content: center;
+      padding-inline: 7px;
+    }
+
+    /* View Sections */
+    .view {
+      display: none;
+    }
+
+    .view.active {
+      display: block;
+      animation: rise 0.25s ease;
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h2, h3 {
+      font-family: 'Orbitron', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    h2 { font-size: 1.05rem; }
+    h3 { font-size: 0.8rem; }
+
+    .muted,
+    .section-head p {
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    /* Quick Stats */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin: 18px 0 20px;
+    }
+
+    .stat {
+      padding: 16px;
+      border: 1px solid var(--border);
+      background: rgba(255, 48, 48, 0.06);
+      border-radius: 10px;
+    }
+
+    .stat i {
+      color: var(--accent);
+      float: right;
+    }
+
+    .stat small {
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .stat strong {
+      display: block;
+      font: 700 1.7rem 'Orbitron', sans-serif;
+      margin-top: 8px;
+    }
+
+    /* Content Layout Grids & Lists */
+    .grid-two {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 16px;
+    }
+
+    .list {
+      display: grid;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .list-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 13px;
+      border: 1px solid rgba(255, 48, 48, 0.3);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.02);
+      box-shadow: inset 0 0 12px rgba(255, 48, 48, 0.08);
+    }
+
+    .list-item strong {
+      display: block;
+    }
+
+    .tag {
+      color: var(--accent);
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    /* Form Design */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      color: var(--muted);
+      font-size: 0.72rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 11px 12px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      color: #fff;
+      background: #0d0912;
+      outline: none;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 12px rgba(255, 48, 48, 0.18);
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    .audience-note {
+      padding: 11px 12px;
+      border-left: 2px solid var(--accent);
+      background: rgba(161, 0, 255, 0.08);
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .toast {
+      display: none;
+      padding: 10px;
+      margin-top: 8px;
+      color: #b9ffcf;
+      border: 1px solid rgba(80, 255, 140, 0.35);
+      background: rgba(80, 255, 140, 0.07);
+      border-radius: 6px;
+    }
+
+    .toast.show {
+      display: block;
+    }
+
+    /* Calendar Styling */
+    .shared-calendar {
+      display: grid;
+      grid-template-columns: 1.25fr 0.75fr;
+      gap: 16px;
+      margin-top: 18px;
+    }
+
+    .calendar-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .calendar-controls button {
+      border: 1px solid var(--border);
+      background: rgba(161, 0, 255, 0.08);
+      color: #fff;
+      border-radius: 6px;
+      padding: 6px 9px;
+      cursor: pointer;
+    }
+
+    .shared-calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+    }
+
+    .shared-calendar-weekday {
+      padding: 7px 3px;
+      text-align: center;
+      color: var(--accent);
+      font: 700 0.62rem 'Orbitron', sans-serif;
+      text-transform: uppercase;
+    }
+
+    .shared-calendar-day {
+      min-height: 48px;
+      padding: 7px;
+      border: 1px solid rgba(161, 0, 255, 0.16);
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--muted);
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .shared-calendar-day:hover,
+    .shared-calendar-day.selected {
+      border-color: var(--accent);
+      background: rgba(161, 0, 255, 0.16);
+      color: #fff;
+    }
+
+    .shared-calendar-day.empty {
+      border-color: transparent;
+      background: transparent;
+      cursor: default;
+    }
+
+    .shared-calendar-day strong {
+      display: block;
+    }
+
+    .shared-event-dot {
+      display: block;
+      width: 5px;
+      height: 5px;
+      margin-top: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 7px var(--glow);
+    }
+
+    .shared-event {
+      padding: 12px;
+      margin-bottom: 9px;
+      border: 1px solid rgba(161, 0, 255, 0.18);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .shared-event strong,
+    .shared-event small {
+      display: block;
+    }
+
+    .shared-event small {
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* Responsive Queries */
+    @media (max-width: 900px) {
+      body { padding: 12px; }
+      .frame { min-height: calc(100vh - 24px); padding: 26px 14px 18px; }
+      .layout, .layout.collapsed { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .grid-two, .shared-calendar { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 600px) {
+      body { padding: 10px; }
+      .frame { min-height: calc(100vh - 20px); padding: 24px 12px 18px; }
+      .topbar { align-items: flex-start; flex-wrap: wrap; }
+      .top-actions { width: 100%; justify-content: flex-end; }
+      .hero { margin: 22px 0; }
+      .hero h1 { font-size: clamp(1.6rem, 9vw, 2.5rem); letter-spacing: 2px; }
+      .layout, .layout.collapsed { display: block; }
+      .sidebar { display: block; margin-bottom: 14px; }
+      .nav { grid-template-columns: repeat(2, minmax(0, 1fr)); display: grid; }
+      .layout.collapsed .profile-copy,
+      .layout.collapsed .nav-label { opacity: 1; width: auto; pointer-events: auto; }
+      .layout.collapsed .profile,
+      .layout.collapsed .nav button { justify-content: flex-start; padding: 10px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .field.full { grid-column: auto; }
+      .shared-calendar-day { min-height: 46px; padding: 6px; }
+    }
+
+    @media (max-width: 380px) {
+      .nav, .stats { grid-template-columns: 1fr; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-delay: 0ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+    :root { --bg: #040208; --panel: rgba(12, 6, 20, 0.88); --accent: #a855f7; --glow: rgba(168, 85, 247, 0.3); --text: #f3e8ff; --muted: #a885c7; --border: rgba(168, 85, 247, 0.3); }
+    body { display: flex; justify-content: center; align-items: center; padding: 28px; overflow-x: hidden; position: relative; background-color: var(--bg); background-image: radial-gradient(circle at 50% 20%, rgba(168, 85, 247, 0.15), rgba(4, 2, 8, 0.95) 70%); }
+    body::before { content: 'CYBER LYNX'; position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%); color: rgba(255,255,255,.025); -webkit-text-stroke: 1px rgba(168,85,247,.12); font: 900 clamp(4rem, 12vw, 11rem) 'Orbitron', sans-serif; letter-spacing: 12px; white-space: nowrap; pointer-events: none; z-index: 0; }
+    .frame { width: 92%; max-width: 1280px; min-height: 700px; padding: 40px; border: 1px solid var(--border); border-radius: 16px; background: radial-gradient(circle at 50% 20%, rgba(168, 85, 247, 0.15), rgba(4, 2, 8, 0.95) 70%); box-shadow: 0 0 40px var(--glow), inset 0 0 15px rgba(168, 85, 247, 0.12); }
+    .frame > * { position: relative; z-index: 1; }
+    .panel { border: 1px solid var(--border); border-radius: 12px; box-shadow: inset 0 0 12px rgba(168, 85, 247, 0.08); }
+    .icon-btn, .signout { border-color: var(--border); background: rgba(168, 85, 247, 0.08); }
+    .icon-btn:hover, .signout:hover { background: rgba(168, 85, 247, 0.2); }
+    .hero { text-align: center; margin: 28px 0 24px; }
+    .hero h1 { font: 900 clamp(1.8rem, 4vw, 3.2rem)/1 'Orbitron', sans-serif; letter-spacing: 3px; text-transform: uppercase; text-shadow: 0 0 12px var(--glow); }
+    .hero p { color: var(--accent); letter-spacing: 3px; }
+    .nav button { border-radius: 4px; text-transform: uppercase; letter-spacing: 1px; font: 700 0.7rem 'Orbitron', sans-serif; }
+    .nav button:hover, .nav button.active { background: rgba(168, 85, 247, 0.16); }
+    .stat { border-color: var(--border); border-radius: 10px; background: rgba(168, 85, 247, 0.08); }
+    .stat strong { font: 700 1.7rem 'Orbitron', sans-serif; }
+    .list-item { align-items: center; border-radius: 8px; }
+    .list-item { box-shadow: inset 0 0 12px rgba(168, 85, 247, 0.08); }
+    input:focus, select:focus, textarea:focus { box-shadow: 0 0 12px rgba(168, 85, 247, 0.22); }
+    .shared-calendar-day { border-color: rgba(168, 85, 247, 0.18); }
+    .shared-calendar-day:hover, .shared-calendar-day.selected { background: rgba(168, 85, 247, 0.16); }
+    .shared-event { border-color: rgba(168, 85, 247, 0.2); }
+    .brand-bcc, .brand-is { width: 48px; height: 48px; border: 2px solid var(--accent); border-radius: 8px; object-fit: contain; background: rgba(0, 0, 0, 0.8); padding: 4px; box-shadow: 0 0 16px var(--glow); }
+    .brand small { display: none; }
+    .primary { border: 1px solid var(--accent); border-radius: 8px; background: var(--accent); color: #fff; box-shadow: 0 0 12px var(--glow); }
+    .primary:hover { background: #c084fc; color: #fff; box-shadow: 0 0 20px var(--accent); }
+    .post-actions { display: flex; align-items: center; gap: 6px; }
+    .post-actions button { border: 1px solid var(--border); border-radius: 5px; background: transparent; color: var(--text); padding: 7px 9px; cursor: pointer; }
+    .post-actions button:hover { border-color: var(--accent); }
+    .post-empty { padding: 18px; border: 1px dashed var(--border); border-radius: 6px; color: var(--muted); }
+    @media (max-width: 900px) { .sidebar { display: block; } .layout.collapsed { grid-template-columns: 1fr; } .layout.collapsed .profile-copy, .layout.collapsed .nav-label { opacity: 1; width: auto; pointer-events: auto; } .layout.collapsed .profile, .layout.collapsed .nav button { justify-content: flex-start; padding: 10px; } }
+    @media (max-width: 768px) { body { align-items: flex-start; padding: 12px; } .frame { width: 100%; min-height: calc(100vh - 24px); padding: 24px; } }
+    @media (max-width: 600px) {
+      body { padding: 10px; }
+      .frame { min-height: calc(100vh - 20px); padding: 24px 12px 18px; }
+      .hero { text-align: center; }
+      .layout, .layout.collapsed { display: flex; flex-direction: column; gap: 12px; }
+      .sidebar { position: sticky; top: 0; z-index: 15; display: block; width: 100%; margin: 0; padding: 9px; background: rgba(12, 6, 20, .97); box-shadow: 0 8px 20px rgba(0, 0, 0, .35); }
+      .sidebar .profile { display: none; }
+      .nav, .layout.collapsed .nav { display: flex; flex-flow: row nowrap; gap: 7px; margin-top: 0; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: thin; }
+      .nav button, .layout.collapsed .nav button { flex: 0 0 auto; width: auto; justify-content: flex-start; gap: 7px; min-height: 42px; padding: 10px 12px; }
+      .layout.collapsed .nav-label { opacity: 1; width: auto; pointer-events: auto; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="frame">
+    <!-- Header Controls -->
+    <header class="topbar">
+      <div class="brand" aria-label="Bacolod City College Information Systems">
+        <img class="brand-bcc" src="bcc.jpg" alt="Bacolod City College seal">
+        <img class="brand-is" src="IS.jpg" alt="Information Systems department shield">
+      </div>
+      <div class="top-actions">
+        <button class="icon-btn" title="Notifications" aria-label="Notifications"><i class="fa-solid fa-bell"></i></button>
+        <button class="signout" id="signout"><i class="fa-solid fa-right-from-bracket"></i> Sign out</button>
+      </div>
+    </header>
+
+    <!-- Hero Title -->
+    <section class="hero">
+      <h1>Officer Control</h1>
+      <p>Department Portal</p>
+    </section>
+
+    <!-- Layout Container -->
+    <div class="layout collapsed" id="layout">
+      
+      <!-- Sidebar Navigation -->
+      <aside class="panel sidebar" id="sidebar">
+        <div class="profile">
+          <div class="avatar" id="officer-initial">O</div>
+          <div class="profile-copy">
+            <strong id="officer-name">Loading...</strong>
+            <small id="officer-email">Loading...</small>
+          </div>
+        </div>
+        <nav class="nav">
+          <button class="active" data-view="overview"><i class="fa-solid fa-chart-line"></i><span class="nav-label">Overview</span></button>
+          <button data-view="manage"><i class="fa-solid fa-list-check"></i><span class="nav-label">Manage Posts</span></button>
+          <button data-view="calendar"><i class="fa-solid fa-calendar"></i><span class="nav-label">Calendar</span></button>
+          <button data-view="compose"><i class="fa-solid fa-pen-to-square"></i><span class="nav-label">Compose</span></button>
+        </nav>
+      </aside>
+
+      <!-- Main Dashboard Content -->
+      <main class="content">
+
+        <!-- Overview Section -->
+        <section class="panel view active" id="overview">
+          <div class="section-head">
+            <div>
+              <h2>Dashboard Overview</h2>
+              <p>Monitor and publish department bulletins.</p>
+            </div>
+          </div>
+          <div class="stats">
+            <div class="stat"><i class="fa-solid fa-file-lines"></i><small>Total posts</small><strong id="post-count">—</strong></div>
+            <div class="stat"><i class="fa-solid fa-paper-plane"></i><small>Published</small><strong id="published-count">—</strong></div>
+            <div class="stat"><i class="fa-solid fa-users"></i><small>Audience groups</small><strong id="audience-count">—</strong></div>
+            <div class="stat"><i class="fa-solid fa-bolt"></i><small>Portal status</small><strong>LIVE</strong></div>
+          </div>
+          <div class="grid-two">
+            <div class="panel">
+              <div class="section-head">
+                <h3>Recent bulletins</h3>
+                <span class="muted">Live feed</span>
+              </div>
+              <div class="list" id="recent-list"><p class="muted">Loading announcements...</p></div>
+            </div>
+            <div class="panel">
+              <div class="section-head"><h3>Quick action</h3></div>
+              <p class="muted" style="margin: 16px 0;">Create a targeted announcement for a specific student group.</p>
+              <button class="primary" data-view="compose"><i class="fa-solid fa-pen"></i> Compose notice</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Manage Posts Section -->
+        <section class="panel view" id="manage">
+          <div class="section-head">
+            <div>
+              <h2>Manage Posts</h2>
+              <p>Edit and review current bulletin announcements.</p>
+            </div>
+            <button class="primary" data-view="compose"><i class="fa-solid fa-plus"></i> New post</button>
+          </div>
+          <div class="list" id="manage-list"><div class="post-empty">Loading announcements...</div></div>
+        </section>
+
+        <!-- Calendar Section -->
+        <section class="panel view" id="calendar">
+          <div class="section-head">
+            <div>
+              <h2>Calendar</h2>
+              <p>Upcoming events and holidays.</p>
+            </div>
+            <div class="calendar-controls">
+              <button type="button" id="officer-calendar-prev" aria-label="Previous month"><i class="fa-solid fa-chevron-left"></i></button>
+              <span class="tag" id="officer-calendar-label"></span>
+              <button type="button" id="officer-calendar-next" aria-label="Next month"><i class="fa-solid fa-chevron-right"></i></button>
+            </div>
+          </div>
+          <div class="shared-calendar">
+            <div class="panel"><div class="shared-calendar-grid" id="officer-calendar-grid"></div></div>
+            <div class="panel">
+              <h3>Upcoming events</h3>
+              <div id="officer-calendar-events" style="margin-top: 14px;"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Compose Announcement Section -->
+        <section class="panel view" id="compose">
+          <div class="section-head">
+            <div>
+              <h2>Compose Announcement</h2>
+              <p>Choose exactly who should see this bulletin.</p>
+            </div>
+          </div>
+          <form id="compose-form">
+            <input type="hidden" id="notice-id">
+            <div class="form-grid">
+              <div class="field full">
+                <label for="notice-title">Notice title</label>
+                <input id="notice-title" required placeholder="Enter announcement title">
+              </div>
+              <div class="field">
+                <label for="notice-category">Category</label>
+                <select id="notice-category">
+                  <option value="ACADEMIC">Academic</option>
+                  <option value="EVENTS">Events</option>
+                  <option value="ATHLETICS">Athletics</option>
+                  <option value="FACILITIES">Facilities</option>
+                  <option value="URGENT">Urgent</option>
+                  <option value="GENERAL">General</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="audience">Target group</label>
+                <select id="audience">
+                  <option value="all">All students</option>
+                  <option value="course">Specific course</option>
+                  <option value="year">Specific year level</option>
+                  <option value="section">Specific section</option>
+                </select>
+              </div>
+              <div class="field" id="course-field">
+                <label for="course">Course</label>
+                <select id="course">
+                  <option>BS Information Systems</option>
+                </select>
+              </div>
+              <div class="field" id="year-field">
+                <label for="year">Year level</label>
+                <select id="year">
+                  <option>1st Year</option>
+                  <option>2nd Year</option>
+                  <option>3rd Year</option>
+                  <option>4th Year</option>
+                </select>
+              </div>
+              <div class="field" id="section-field">
+                <label for="section">Section</label>
+                <input id="section" placeholder="Example: A">
+              </div>
+              <div class="field full">
+                <label for="notice-body">Message</label>
+                <textarea id="notice-body" rows="6" required placeholder="Write the announcement..."></textarea>
+              </div>
+              <div class="field full">
+                <div class="audience-note" id="audience-note"></div>
+              </div>
+              <div class="field full">
+                <button class="primary" type="submit"><i class="fa-solid fa-paper-plane"></i> <span id="compose-submit-label">Publish announcement</span></button>
+                <div class="toast" id="toast" role="status" aria-live="polite"></div>
+              </div>
+            </div>
+          </form>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <script>
+    // Navigation Hover Collapse
+    const layout = document.getElementById('layout');
+    const sidebar = document.getElementById('sidebar');
+
+    const desktopHoverNavigation = window.matchMedia('(hover: hover) and (min-width: 901px)');
+    function updateOfficerNavigationMode() {
+      layout.classList.toggle('collapsed', desktopHoverNavigation.matches);
+    }
+    updateOfficerNavigationMode();
+    desktopHoverNavigation.addEventListener('change', updateOfficerNavigationMode);
+    sidebar.addEventListener('mouseenter', () => {
+      if (desktopHoverNavigation.matches) layout.classList.remove('collapsed');
+    });
+    sidebar.addEventListener('mouseleave', () => {
+      if (desktopHoverNavigation.matches) layout.classList.add('collapsed');
+    });
+
+    // Inject Live Bulletin link dynamically if missing
+    const officerNavigation = document.querySelector('.nav');
+    let officerEmail = '';
+    if (officerNavigation && !officerNavigation.querySelector('[data-live-bulletin]')) {
+      const liveBulletinButton = document.createElement('button');
+      liveBulletinButton.type = 'button';
+      liveBulletinButton.dataset.liveBulletin = 'true';
+      liveBulletinButton.innerHTML = '<i class="fa-solid fa-display"></i><span class="nav-label">Live Bulletin</span>';
+      liveBulletinButton.addEventListener('click', () => { window.location.href = 'bulletin.html'; });
+      officerNavigation.insertBefore(liveBulletinButton, officerNavigation.querySelector('[data-view="calendar"]'));
+    }
+
+    // Load Session Profile
+    async function loadOfficerProfile() {
+      try {
+        const response = await fetch('conn.php?action=officer_session', { credentials: 'same-origin' });
+        if (!response.ok) throw new Error('Officer session expired');
+        
+        const profile = await response.json();
+        const name = profile.name || 'Officer';
+        officerEmail = profile.email || '';
+        
+        document.getElementById('officer-name').textContent = name;
+        document.getElementById('officer-email').textContent = profile.email || '';
+        document.getElementById('officer-initial').textContent = name.charAt(0).toUpperCase();
+        loadOfficerAnnouncements();
+      } catch (error) {
+        window.location.href = 'officer-login.html?message=' + encodeURIComponent('Please sign in to access the officer dashboard.');
+      }
+    }
+    loadOfficerProfile();
+
+    // View Switching
+    const views = document.querySelectorAll('.view');
+    function openView(name) {
+      views.forEach(view => view.classList.toggle('active', view.id === name));
+      document.querySelectorAll('[data-view]').forEach(button => button.classList.toggle('active', button.dataset.view === name));
+    }
+
+    document.querySelectorAll('[data-view]').forEach(button => {
+      button.addEventListener('click', () => openView(button.dataset.view));
+    });
+
+    // Calendar Module
+    let officerCalendarMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+
+    function renderOfficerCalendar() {
+      const events = JSON.parse(localStorage.getItem('bulletin-calendar-events') || '[]');
+      const year = officerCalendarMonth.getFullYear();
+      const month = officerCalendarMonth.getMonth();
+      const keyFor = day => year + '-' + String(month + 1).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+
+      document.getElementById('officer-calendar-label').textContent = officerCalendarMonth.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+      
+      const grid = document.getElementById('officer-calendar-grid');
+      grid.innerHTML = '';
+
+      ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(day => {
+        const label = document.createElement('span');
+        label.className = 'shared-calendar-weekday';
+        label.textContent = day;
+        grid.appendChild(label);
+      });
+
+      for (let blank = 0; blank < new Date(year, month, 1).getDay(); blank++) {
+        const empty = document.createElement('span');
+        empty.className = 'shared-calendar-day empty';
+        grid.appendChild(empty);
+      }
+
+      for (let day = 1; day <= new Date(year, month + 1, 0).getDate(); day++) {
+        const dayEvents = events.filter(event => event.date === keyFor(day));
+        const cell = document.createElement('button');
+        cell.type = 'button';
+        cell.className = 'shared-calendar-day' + (dayEvents.length ? ' has-event' : '');
+        cell.innerHTML = '<strong>' + day + '</strong>' + (dayEvents.length ? '<span class="shared-event-dot"></span>' : '');
+        grid.appendChild(cell);
+      }
+
+      const list = document.getElementById('officer-calendar-events');
+      const monthEvents = events.filter(event => {
+        const date = new Date(event.date + 'T00:00:00');
+        return date.getFullYear() === year && date.getMonth() === month;
+      }).sort((a, b) => a.date.localeCompare(b.date));
+
+      list.innerHTML = monthEvents.length ? '' : '<p class="muted">No events scheduled this month.</p>';
+      
+      monthEvents.forEach(event => {
+        const item = document.createElement('div');
+        item.className = 'shared-event';
+        item.innerHTML = '<strong></strong><small></small>';
+        item.querySelector('strong').textContent = event.title + ' · ' + event.type;
+        item.querySelector('small').textContent = new Date(event.date + 'T00:00:00').toLocaleDateString() + ' · ' + event.audience;
+        list.appendChild(item);
+      });
+    }
+
+    document.getElementById('officer-calendar-prev').addEventListener('click', () => {
+      officerCalendarMonth.setMonth(officerCalendarMonth.getMonth() - 1);
+      renderOfficerCalendar();
+    });
+
+    document.getElementById('officer-calendar-next').addEventListener('click', () => {
+      officerCalendarMonth.setMonth(officerCalendarMonth.getMonth() + 1);
+      renderOfficerCalendar();
+    });
+
+    renderOfficerCalendar();
+
+    // Audience Dynamic Fields Toggle
+    const audience = document.getElementById('audience');
+    const courseField = document.getElementById('course-field');
+    const yearField = document.getElementById('year-field');
+    const sectionField = document.getElementById('section-field');
+    const note = document.getElementById('audience-note');
+
+    function updateAudience() {
+      const value = audience.value;
+      courseField.style.display = value === 'course' ? 'grid' : 'none';
+      yearField.style.display = value === 'year' ? 'grid' : 'none';
+      sectionField.style.display = value === 'section' ? 'grid' : 'none';
+
+      const detail = value === 'course' 
+        ? document.getElementById('course').value 
+        : value === 'year' 
+        ? document.getElementById('year').value 
+        : value === 'section' 
+        ? 'section ' + (document.getElementById('section').value || 'to be selected') 
+        : 'all enrolled students';
+
+      note.textContent = 'This announcement will be visible to ' + detail + '.';
+    }
+
+    audience.addEventListener('change', updateAudience);
+    document.getElementById('course').addEventListener('change', updateAudience);
+    document.getElementById('year').addEventListener('change', updateAudience);
+    document.getElementById('section').addEventListener('input', updateAudience);
+    updateAudience();
+
+    document.querySelectorAll('[data-view="compose"]').forEach(button => button.addEventListener('click', () => {
+      if (!document.getElementById('notice-id').value) return;
+      document.getElementById('compose-form').reset();
+      document.getElementById('notice-id').value = '';
+      document.getElementById('compose-submit-label').textContent = 'Publish announcement';
+      updateAudience();
+    }));
+
+    let officerAnnouncements = [];
+    const manageList = document.getElementById('manage-list');
+    const recentList = document.getElementById('recent-list');
+
+    function audienceLabel(announcement) {
+      if (announcement.audience_type === 'all') return 'All students';
+      if (announcement.audience_type === 'section') return 'Section ' + announcement.audience_value;
+      return announcement.audience_value;
+    }
+
+    function makeOfficerPost(announcement, allowActions) {
+      const row = document.createElement('div');
+      row.className = 'list-item';
+      const copy = document.createElement('div');
+      const title = document.createElement('strong');
+      const details = document.createElement('span');
+      details.className = 'muted';
+      title.textContent = announcement.title;
+      details.textContent = announcement.category + ' · ' + announcement.created_by + ' · ' + new Date(announcement.created_at).toLocaleDateString();
+      copy.append(title, details);
+      const tag = document.createElement('span');
+      tag.className = 'tag';
+      tag.textContent = audienceLabel(announcement);
+      row.append(copy, tag);
+      if (allowActions && announcement.created_by === officerEmail) {
+        const actions = document.createElement('div');
+        actions.className = 'post-actions';
+        ['edit', 'delete'].forEach(action => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.dataset.postAction = action;
+          button.dataset.postId = announcement.id;
+          button.title = action === 'edit' ? 'Edit announcement' : 'Delete announcement';
+          button.setAttribute('aria-label', button.title);
+          button.innerHTML = action === 'edit' ? '<i class="fa-solid fa-pen"></i>' : '<i class="fa-solid fa-trash"></i>';
+          actions.appendChild(button);
+        });
+        row.appendChild(actions);
+      }
+      return row;
+    }
+
+    function renderOfficerAnnouncements() {
+      manageList.replaceChildren();
+      recentList.replaceChildren();
+      document.getElementById('post-count').textContent = officerAnnouncements.length;
+      document.getElementById('published-count').textContent = officerAnnouncements.length;
+      document.getElementById('audience-count').textContent = new Set(officerAnnouncements.map(item => item.audience_type)).size;
+      if (!officerAnnouncements.length) {
+        manageList.innerHTML = '<div class="post-empty">No announcements yet. Compose the first department notice.</div>';
+        recentList.innerHTML = '<p class="muted">No recent announcements.</p>';
+        return;
+      }
+      officerAnnouncements.forEach(item => manageList.appendChild(makeOfficerPost(item, true)));
+      officerAnnouncements.slice(0, 4).forEach(item => recentList.appendChild(makeOfficerPost(item, false)));
+    }
+
+    async function loadOfficerAnnouncements() {
+      try {
+        const response = await fetch('conn.php?action=bulletin_announcements', { credentials: 'same-origin', cache: 'no-store' });
+        if (!response.ok) throw new Error('Announcements are unavailable');
+        const data = await response.json();
+        officerAnnouncements = data.announcements || [];
+        renderOfficerAnnouncements();
+      } catch (error) {
+        manageList.innerHTML = '<div class="post-empty">Announcements could not be loaded.</div>';
+        recentList.innerHTML = '<p class="muted">Announcements are unavailable.</p>';
+      }
+    }
+
+    manageList.addEventListener('click', async event => {
+      const button = event.target.closest('button[data-post-action]');
+      if (!button) return;
+      const announcement = officerAnnouncements.find(item => String(item.id) === button.dataset.postId);
+      if (!announcement || announcement.created_by !== officerEmail) return;
+      if (button.dataset.postAction === 'edit') {
+        document.getElementById('notice-id').value = announcement.id;
+        document.getElementById('notice-title').value = announcement.title;
+        document.getElementById('notice-category').value = announcement.category;
+        audience.value = announcement.audience_type;
+        document.getElementById('course').value = announcement.audience_type === 'course' ? announcement.audience_value : document.getElementById('course').options[0].value;
+        document.getElementById('year').value = announcement.audience_type === 'year' ? announcement.audience_value : document.getElementById('year').options[0].value;
+        document.getElementById('section').value = announcement.audience_type === 'section' ? announcement.audience_value : '';
+        document.getElementById('notice-body').value = announcement.message;
+        document.getElementById('compose-submit-label').textContent = 'Save changes';
+        updateAudience();
+        openView('compose');
+        return;
+      }
+      if (!window.confirm('Delete this announcement?')) return;
+      try {
+        const response = await fetch('conn.php?action=delete_announcement', {
+          method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: announcement.id })
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || 'Announcement could not be removed.');
+        loadOfficerAnnouncements();
+      } catch (error) {
+        window.alert(error.message);
+      }
+    });
+
+    // Dynamic Announcement Submission
+    document.getElementById('compose-form').addEventListener('submit', async event => {
+      event.preventDefault();
+      const toast = document.getElementById('toast');
+      const audienceType = audience.value;
+      const audienceValue = audienceType === 'course' ? document.getElementById('course').value
+        : audienceType === 'year' ? document.getElementById('year').value
+        : audienceType === 'section' ? document.getElementById('section').value.trim() : '';
+      const id = document.getElementById('notice-id').value;
+      try {
+        const response = await fetch('conn.php?action=' + (id ? 'update_announcement' : 'publish_announcement'), {
+          method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id, title: document.getElementById('notice-title').value.trim(),
+            category: document.getElementById('notice-category').value, audienceType, audienceValue,
+            message: document.getElementById('notice-body').value.trim()
+          })
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || 'Announcement could not be published.');
+        toast.textContent = id ? 'Announcement updated.' : 'Announcement published to the student portal.';
+        toast.classList.add('show');
+        event.target.reset();
+        document.getElementById('notice-id').value = '';
+        document.getElementById('compose-submit-label').textContent = 'Publish announcement';
+        updateAudience();
+        loadOfficerAnnouncements();
+      } catch (error) {
+        toast.textContent = error.message;
+        toast.classList.add('show');
+      }
+    });
+
+    // Logout Handler
+    document.getElementById('signout').addEventListener('click', () => {
+      window.location.href = 'conn.php?action=logout';
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,10 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "notificationSignals": {
+      ".read": true,
+      ".write": false
+    }
+  }
+}
